@@ -4,26 +4,11 @@ import sys
 import tempfile
 import itertools
 import tarfile
+import logging
 from git import *
 
 
-class Revision:
-    def hash(self):
-        raise NotImplemented
-
-    def change(self):
-        raise NotImplemented
-
-    def __repr__(self):
-        return "Revision: %s" % self.hash()
-
-
-class Change:
-    def files(self):
-        raise NotImplemented
-
-    def export():
-        raise NotImplemented
+logger = logging.getLogger(__name__)
 
 
 class Git:
@@ -32,6 +17,7 @@ class Git:
         self.path = kwargs.get("path", "")
         tmpdir = kwargs.get("tmpdir", None)
         self.repodir = tempfile.mkdtemp(prefix='git', dir=tmpdir)
+        logger.debug("cloning repo '%s' to %s", url, self.repodir)
         self.repo = Repo.clone_from(url, self.repodir)
 
     def revisions(self, begin=None, end="HEAD", branch='master'):
@@ -68,13 +54,16 @@ class Git:
         revision = branch
         if begin is not None:
             revision = "%s..%s" % (begin, end)
+        logger.debug("searching for %s", revision)
         commits = self.repo.iter_commits(revision, paths=self.path)
         return itertools.imap(lambda x: GitRevision(x), commits)
 
     def export(self, dest, files, treeish=None):
         buffer = io.BytesIO()
+        logger.debug("extracting files from revision: %s", treeish)
         self.repo.archive(buffer, treeish=treeish, format='tar')
         buffer.seek(0, 0)
+        logger.debug("unpacking files: %s", str(files))
         archive = tarfile.TarFile(fileobj=buffer)
         files = set(archive.getnames()) | set(files)
         files = map(archive.getmember, files)
@@ -83,4 +72,5 @@ class Git:
     def __del__(self):
         import shutil
         if os.path.isdir(self.repodir):
+            logger.debug("deleting temp directory: %s", self.repodir)
             shutil.rmtree(self.repodir)
