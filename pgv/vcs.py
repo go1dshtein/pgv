@@ -23,7 +23,7 @@ class Git:
     def revisions(self, begin=None, end="HEAD", branch='master'):
         this = self
 
-        class GitChange(Change):
+        class GitChange:
             def __init__(self, files, hexsha):
                 self.files = files
                 self.hexsha = hexsha
@@ -31,7 +31,7 @@ class Git:
             def export(self, dest):
                 return this.export(dest, self.files, self.hexsha)
 
-        class GitRevision(Revision):
+        class GitRevision:
             def __init__(self, gitcommit):
                 self.gitcommit = gitcommit
 
