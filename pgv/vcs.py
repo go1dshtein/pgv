@@ -5,7 +5,6 @@ import tempfile
 import itertools
 import tarfile
 import logging
-import shutil
 from git import *
 
 
@@ -35,6 +34,7 @@ class Git:
         class GitRevision:
             def __init__(self, gitcommit):
                 self.gitcommit = gitcommit
+                self._change = None
 
             def hash(self):
                 return self.gitcommit.hexsha
@@ -48,16 +48,21 @@ class Git:
                 return False
 
             def change(self):
-                files = filter(self._filter_files,
-                               self.gitcommit.stats.files.viewitems())
-                return GitChange(dict(files).keys(), self.gitcommit.hexsha)
+                if self._change is None:
+                    files = filter(self._filter_files,
+                                   self.gitcommit.stats.files.viewitems())
+                    self._change = GitChange(dict(files).keys(),
+                                             self.gitcommit.hexsha)
+                return self._change
 
         revision = branch
         if begin is not None:
             revision = "%s..%s" % (begin, end)
         logger.debug("searching for %s", revision)
         commits = self.repo.iter_commits(revision, paths=self.path)
-        return itertools.imap(lambda x: GitRevision(x), commits)
+        return itertools.ifilter(
+            lambda x: x.change().files, itertools.imap(
+                lambda x: GitRevision(x), commits))
 
     def export(self, dest, files, treeish=None):
         buffer = io.BytesIO()
