@@ -20,7 +20,8 @@ class Git:
         logger.debug("cloning repo '%s' to %s", url, self.repodir)
         self.repo = Repo.clone_from(url, self.repodir)
 
-    def revisions(self, begin=None, end="HEAD", branch='master'):
+    def revisions(self, begin=None, end="HEAD",
+                  branch='master', revision=None):
         this = self
 
         class GitChange:
@@ -55,11 +56,15 @@ class Git:
                                              self.gitcommit.hexsha)
                 return self._change
 
-        revision = branch
+        revisions = branch
         if begin is not None:
-            revision = "%s..%s" % (begin, end)
-        logger.debug("searching for %s", revision)
-        commits = self.repo.iter_commits(revision, paths=self.path)
+            revisions = "%s...%s" % (begin, end)
+        if begin == end:
+            revisions = begin
+        if revision is not None:
+            revisions = revision
+        logger.debug("searching for %s", revisions)
+        commits = self.repo.iter_commits(revisions, paths=self.path)
         return itertools.ifilter(
             lambda x: x.change().files, itertools.imap(
                 lambda x: GitRevision(x), commits))
@@ -71,7 +76,7 @@ class Git:
         buffer.seek(0, 0)
         logger.debug("unpacking files: %s", str(files))
         archive = tarfile.TarFile(fileobj=buffer)
-        files = set(archive.getnames()) | set(files)
+        files = set(archive.getnames()) & set(files)
         files = map(archive.getmember, files)
         archive.extractall(dest, members=files)
 
