@@ -1,2 +1,56 @@
-#!/usr/bin/env python27
+#!/usr/bin/env python2.7
+import argparse
+import os
 
+
+def parse():
+    def add_connection(parser, required=False):
+        g = parser.add_argument_group(title="database connection arguments")
+        g.add_argument('-d', '--dbname', required=required)
+        g.add_argument('-h', '--host')
+        g.add_argument('-p', '--port')
+        g.add_argument('-U', '--username')
+        g.add_argument('-w', '--no-password', dest="prompt_password",
+                       action="store_false", default=True)
+        g.add_argument('-W', '--password', dest="prompt_password",
+                       action="store_true")
+
+    def add_version(parser):
+        g = parser.add_argument_group(title="version arguments")
+        g.add_argument('-f', '--from', dest="from_version", metavar="VERSION")
+        g.add_argument('-t', '--to', dest="to_version", metavar="VERSION")
+
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--help', action="help")
+    parser.add_argument('-c', '--config', metavar="FILENAME",
+                        default=os.path.join(os.getcwd(), ".pvd.json"),
+                        help="main configuration file")
+    commands = parser.add_subparsers(dest="command")
+    make = commands.add_parser('make', add_help=False,
+                               help="make schema package")
+    init = commands.add_parser('init', add_help=False,
+                               help="init versioning in database")
+    init.add_argument('--help', action="help")
+    add_connection(init)
+    make.add_argument('--help', action="help")
+    add_version(make)
+    add_connection(make)
+    install = commands.add_parser('install', add_help=False,
+                                  help="install schema package to database")
+    install.add_argument('--help', action="help")
+    install.add_argument('--devel', action="store_true",
+                         help="install schema from working directory")
+    add_version(install)
+    add_connection(install, True)
+    skip = commands.add_parser('skip', add_help=False,
+                               help="skip revision from package")
+    skip.add_argument('--help', action="help")
+    skip.add_argument('revision')
+    skip.add_argument('-f', '--filename',
+                      help="skip only this filename",
+                      action="append")
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    arguments = parse()
