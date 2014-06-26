@@ -20,3 +20,11 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(config.test.key1, ["1", "2", "3"])
         self.assertEquals(config.test.key2, "string")
         self.assertEquals(config.test.key3, 123)
+
+    def test_check_file(self):
+        self.assertEquals(
+            pgv.config.check_filename(self.json_file),
+            self.json_file)
+        self.assertEquals(
+            pgv.config.check_filename(self.yaml_file),
+            self.yaml_file)
