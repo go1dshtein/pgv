@@ -5,6 +5,7 @@ import tempfile
 import itertools
 import tarfile
 import logging
+import shutil
 from git import *
 
 

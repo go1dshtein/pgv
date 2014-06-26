@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+import os
+from setuptools import setup
 
 
 setup(name='pgv',
@@ -14,8 +12,8 @@ setup(name='pgv',
       packages=['pgv'],
       package_dir={'pgv': 'pgv'},
       # package_data={'patch_db.database': ['sql/*.sql', 'sql/*.psql']},
-      requires=['GitPython >= 0.3.1', 'psycopg2'],
-      test_suite='tests',
+      install_requires=['GitPython >= 0.3.1', 'psycopg2'],
+      test_suite='test',
       scripts=['bin/pgv'],
       license='GPL',
       classifiers=['Intended Audience :: System Administrators',
