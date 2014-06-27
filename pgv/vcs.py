@@ -57,8 +57,9 @@ class Git:
                 if self._change is None:
                     files = filter(self._filter_files,
                                    self.gitcommit.stats.files.viewitems())
-                    self._change = GitChange(dict(files).keys(),
-                                             self.gitcommit.hexsha)
+                    files = map(lambda x: x[len(this.path):].lstrip('/'),
+                                dict(files).viewkeys())
+                    self._change = GitChange(files, self.gitcommit.hexsha)
                 return self._change
 
         revisions = branch
@@ -74,25 +75,55 @@ class Git:
             lambda x: x.change().files, itertools.imap(
                 lambda x: GitRevision(x), commits))
 
-    def export(self, dest, files=None, treeish=None, include=None):
+    def _get_archive(self, treeish):
         buffer = io.BytesIO()
-        logger.debug("extracting files from revision: %s", treeish)
+        logger.debug("archiving files from revision: %s", treeish)
         self.repo.archive(buffer, treeish=treeish, format='tar')
         buffer.seek(0, 0)
-        archive = tarfile.TarFile(fileobj=buffer)
+        return tarfile.TarFile(fileobj=buffer)
+
+    def _get_members(self, archive, files, include):
         members = set([])
         if files is not None:
+            files = map(lambda x: os.path.join(self.path, x), files)
             logger.debug("unpacking files: %s", str(files))
             members |= set(archive.getnames()) & set(files)
         if include is not None:
             logger.debug("including files: %s", str(include))
             for glob in include:
+                glob = os.path.join(self.path, glob)
                 members |= set(fnmatch.filter(archive.getnames(), glob))
         if not members:
-            members = archive.getname()
+            members = archive.getnames()
         logger.debug("files: %s", members)
-        members = map(archive.getmember, members)
-        archive.extractall(dest, members=members)
+        return map(archive.getmember, members)
+
+    def _export_members(self, archive, members, dest):
+        for member in members:
+            name = member.name[len(self.path):].lstrip('/')
+            if member.isdir():
+                logger.debug("extracting: directory: %s -> %s",
+                             member.name, name)
+                directory = os.path.join(dest, name)
+                if not os.path.isdir(directory):
+                    os.makedirs(directory)
+            elif member.isfile():
+                filename = os.path.join(dest, name)
+                directory = os.path.dirname(filename)
+                if not os.path.isdir(directory):
+                    os.makedirs(directory)
+                logger.debug("extracting: file: %s -> %s",
+                             member.name, name)
+                with open(filename, 'wb') as h:
+                    afile = archive.extractfile(member)
+                    h.write(afile.read())
+            else:
+                raise NotImplemented()
+
+    def export(self, dest, files=None, treeish=None, include=None):
+        archive = self._get_archive(treeish)
+        members = self._get_members(archive, files, include)
+        self._export_members(archive, members, dest)
 
     def __del__(self):
         if os.path.isdir(self.repodir):

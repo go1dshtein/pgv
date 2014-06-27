@@ -42,8 +42,8 @@ class TestVSCGit(unittest.TestCase):
         hash = "ec53903436426b460fd5de84896fe6648bff7b2b"
         revs = list(repo.revisions(revision=hash))
         files = revs[0].change().files
-        self.assertTrue(
-            files == ['test/data/schemas/private/functions/test.sql'])
+        self.assertEquals(
+            files, ['schemas/private/functions/test.sql'])
 
     def test_change_files_without_insertions(self):
         repo = pgv.vcs.Git(url="file://%s" % self.url, path="test/data/sql")
@@ -52,8 +52,8 @@ class TestVSCGit(unittest.TestCase):
         files = revs[0].change().files
         self.assertEquals(
             files,
-            ['test/data/sql/schemas/private/functions/test.sql',
-             'test/data/sql/schemas/private/functions/test2.sql'])
+            ['schemas/private/functions/test.sql',
+             'schemas/private/functions/test2.sql'])
 
     def test_change_export(self):
         repo = pgv.vcs.Git(url="file://%s" % self.url, path="test/data")
@@ -62,23 +62,18 @@ class TestVSCGit(unittest.TestCase):
         tmp = tempfile.mkdtemp()
         try:
             rev.change().export(tmp)
-            self.assertTrue(os.listdir(tmp) == ['test'])
-            self.assertTrue(os.listdir(os.path.join(tmp, 'test')) == ['data'])
             self.assertTrue(
-                os.listdir(os.path.join(tmp, 'test/data')) == ['schemas'])
+                os.listdir(tmp) == ['schemas'])
             self.assertTrue(
-                os.listdir(
-                    os.path.join(tmp, 'test/data/schemas')) == ['private'])
+                os.listdir(os.path.join(tmp, 'schemas')) == ['private'])
             self.assertTrue(
                 os.path.isfile(
                     os.path.join(
                         tmp,
-                        'test/data/schemas/private/functions/test.sql')))
+                        'schemas/private/functions/test.sql')))
             orig = os.path.join(os.path.dirname(__file__),
                                 "data/sql/schemas/private/functions/test.sql")
-            expr = os.path.join(
-                tmp,
-                "test/data/schemas/private/functions/test.sql")
+            expr = os.path.join(tmp, "schemas/private/functions/test.sql")
             with open(orig) as h:
                 orig = h.read()
             with open(expr) as h:
@@ -91,13 +86,13 @@ class TestVSCGit(unittest.TestCase):
     def test_change_export_include(self):
         repo = pgv.vcs.Git(url="file://%s" % self.url,
                            path="test/data/sql",
-                           include=("test/data/sql/schemas/*/types/*.sql",))
+                           include=("schemas/*/types/*.sql",))
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
         rev = list(repo.revisions(revision=hash))[0]
         tmp = tempfile.mkdtemp()
         try:
             rev.change().export(tmp)
-            directory = os.path.join(tmp, "test", "data", "sql", "schemas")
+            directory = os.path.join(tmp, "schemas")
             self.assertEquals(
                 os.listdir(os.path.join(directory, "public", "types")),
                 ["data.sql"])
