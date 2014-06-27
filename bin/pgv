@@ -65,7 +65,7 @@ def setup_logging(config):
         config.filename, maxBytes=config.bytes, backupCount=config.count)
     filehandler.setLevel(config.level)
     fileformatter = logging.Formatter(
-        "%(asctime)s: %(levelname)-7s: %(name)-12s: %(lineno)d: %(message)s")
+        "%(asctime)s: %(levelname)-7s: %(name)-12s: %(lineno)-3d: %(message)s")
     filehandler.setFormatter(fileformatter)
     logger.addHandler(filehandler)
     consolehandler = logging.StreamHandler()

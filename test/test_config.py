@@ -6,8 +6,8 @@ import pgv.config
 class TestConfig(unittest.TestCase):
     def setUp(self):
         pwd = os.path.dirname(__file__)
-        self.json_file = os.path.join(pwd, "config.json")
-        self.yaml_file = os.path.join(pwd, "config.yaml")
+        self.json_file = os.path.join(pwd, "data", "config", "config.json")
+        self.yaml_file = os.path.join(pwd, "data", "config", "config.yaml")
 
     def test_read_json(self):
         config = pgv.config.parse(self.json_file)
@@ -28,3 +28,10 @@ class TestConfig(unittest.TestCase):
         self.assertEquals(
             pgv.config.check_filename(self.yaml_file),
             self.yaml_file)
+
+    def test_default(self):
+        config = pgv.config.parse(self.yaml_file)
+        self.assertTrue(config.logging.filename == "build/pgv.log")
+        self.assertTrue(config.logging.level == "INFO")
+        self.assertTrue(config.logging.bytes == 1000000)
+        self.assertTrue(config.logging.count == 4)

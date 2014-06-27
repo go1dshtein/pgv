@@ -26,11 +26,31 @@ def check_filename(filename):
 
 
 def parse(filename):
-    def hook(dct):
-        class Config:
-            def __init__(self):
-                self.__dict__ = dct
-        return Config()
+
+    default = {
+        "logging": {
+            "level": "INFO",
+            "bytes": 1000000,
+            "count": 4,
+            "filename": "build/pgv.log"
+        }
+    }
+
+    class Config:
+        def __init__(self, dct):
+            self.__dict__ = dct
+
+    def hook(pairs):
+        result = []
+        for pair in pairs:
+            key, value = pair
+            for dkey, dvalue in default.viewitems():
+                if key == dkey:
+                    rvalue = dvalue
+                    rvalue.update(value)
+            result.append((key, value))
+        dct = dict(result)
+        return Config(dct)
 
     filename = check_filename(filename)
     with open(filename) as h:
@@ -41,4 +61,8 @@ def parse(filename):
             raise Exception("Could not use yaml - module not found")
         data = json.dumps(yaml.load(data))
 
-    return json.loads(data, object_hook=hook)
+    result = json.loads(data, object_pairs_hook=hook)
+    for dkey, dvalue in default.viewitems():
+        if dkey not in result.__dict__:
+            result.__dict__[dkey] = Config(dvalue)
+    return result
