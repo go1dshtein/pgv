@@ -1,6 +1,9 @@
 #!/usr/bin/env python2.7
 import argparse
+import logging
+import logging.handlers
 import os
+import pgv.config
 
 
 def parse():
@@ -23,7 +26,7 @@ def parse():
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--help', action="help")
     parser.add_argument('-c', '--config', metavar="FILENAME",
-                        default=os.path.join(os.getcwd(), ".pvd.json"),
+                        default=os.path.join(os.getcwd(), ".pgv.yaml"),
                         help="main configuration file")
     commands = parser.add_subparsers(dest="command")
     make = commands.add_parser('make', add_help=False,
@@ -52,5 +55,28 @@ def parse():
     return parser.parse_args()
 
 
+def setup_logging(config):
+    directory = os.path.dirname(config.filename)
+    if not os.path.isdir(directory):
+        os.makedirs(directory)
+    logger = logging.getLogger('')  # root logger
+    logger.setLevel(config.level)
+    filehandler = logging.handlers.RotatingFileHandler(
+        config.filename, maxBytes=config.bytes, backupCount=config.count)
+    filehandler.setLevel(config.level)
+    fileformatter = logging.Formatter(
+        "%(asctime)s: %(levelname)-7s: %(name)-12s: %(lineno)d: %(message)s")
+    filehandler.setFormatter(fileformatter)
+    logger.addHandler(filehandler)
+    consolehandler = logging.StreamHandler()
+    consolehandler.setLevel(logging.INFO)
+    consoleformatter = logging.Formatter("%(message)s")
+    consolehandler.setFormatter(consoleformatter)
+    logger.addHandler(consolehandler)
+
+
 if __name__ == "__main__":
     arguments = parse()
+    config = pgv.config.parse(arguments.config)
+    setup_logging(config.logging)
+    logger = logging.getLogger(__name__)
