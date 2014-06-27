@@ -20,6 +20,7 @@ class Git:
         self.repodir = tempfile.mkdtemp(prefix='git', dir=tmpdir)
         logger.debug("cloning repo '%s' to %s", url, self.repodir)
         self.repo = Repo.clone_from(url, self.repodir)
+        self.include = kwargs.get("include", None)
 
     def revisions(self, begin=None, end="HEAD",
                   branch='master', revision=None):
@@ -31,7 +32,10 @@ class Git:
                 self.hexsha = hexsha
 
             def export(self, dest):
-                return this.export(dest, self.files, self.hexsha)
+                return this.export(dest,
+                                   files=self.files,
+                                   include=this.include,
+                                   treeish=self.hexsha)
 
         class GitRevision:
             def __init__(self, gitcommit):
@@ -75,16 +79,18 @@ class Git:
         logger.debug("extracting files from revision: %s", treeish)
         self.repo.archive(buffer, treeish=treeish, format='tar')
         buffer.seek(0, 0)
-        logger.debug("unpacking files: %s", str(files))
         archive = tarfile.TarFile(fileobj=buffer)
         members = set([])
         if files is not None:
+            logger.debug("unpacking files: %s", str(files))
             members |= set(archive.getnames()) & set(files)
         if include is not None:
+            logger.debug("including files: %s", str(include))
             for glob in include:
                 members |= set(fnmatch.filter(archive.getnames(), glob))
         if not members:
             members = archive.getname()
+        logger.debug("files: %s", members)
         members = map(archive.getmember, members)
         archive.extractall(dest, members=members)
 
