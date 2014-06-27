@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Git:
     def __init__(self, **kwargs):
         url = kwargs["url"]
-        self.path = kwargs.get("path", "")
+        self.prefix = kwargs.get("prefix", "")
         tmpdir = kwargs.get("tmpdir", None)
         self.repodir = tempfile.mkdtemp(prefix='git', dir=tmpdir)
         logger.debug("cloning repo '%s' to %s", url, self.repodir)
@@ -47,7 +47,7 @@ class Git:
 
             def _filter_files(self, file):
                 name, stat = file
-                if not name.startswith(this.path):
+                if not name.startswith(this.prefix):
                     return False
                 if stat.get('lines', 0) > 0:
                     return True
@@ -57,7 +57,7 @@ class Git:
                 if self._change is None:
                     files = filter(self._filter_files,
                                    self.gitcommit.stats.files.viewitems())
-                    files = map(lambda x: x[len(this.path):].lstrip('/'),
+                    files = map(lambda x: x[len(this.prefix):].lstrip('/'),
                                 dict(files).viewkeys())
                     self._change = GitChange(files, self.gitcommit.hexsha)
                 return self._change
@@ -70,7 +70,7 @@ class Git:
         if revision is not None:
             revisions = revision
         logger.debug("searching for %s", revisions)
-        commits = self.repo.iter_commits(revisions, paths=self.path)
+        commits = self.repo.iter_commits(revisions, paths=self.prefix)
         return itertools.ifilter(
             lambda x: x.change().files, itertools.imap(
                 lambda x: GitRevision(x), commits))
@@ -85,13 +85,13 @@ class Git:
     def _get_members(self, archive, files, include):
         members = set([])
         if files is not None:
-            files = map(lambda x: os.path.join(self.path, x), files)
+            files = map(lambda x: os.path.join(self.prefix, x), files)
             logger.debug("unpacking files: %s", str(files))
             members |= set(archive.getnames()) & set(files)
         if include is not None:
             logger.debug("including files: %s", str(include))
             for glob in include:
-                glob = os.path.join(self.path, glob)
+                glob = os.path.join(self.prefix, glob)
                 members |= set(fnmatch.filter(archive.getnames(), glob))
         if not members:
             members = archive.getnames()
@@ -100,7 +100,7 @@ class Git:
 
     def _export_members(self, archive, members, dest):
         for member in members:
-            name = member.name[len(self.path):].lstrip('/')
+            name = member.name[len(self.prefix):].lstrip('/')
             if member.isdir():
                 logger.debug("extracting: directory: %s -> %s",
                              member.name, name)
