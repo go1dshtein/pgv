@@ -49,7 +49,7 @@ class Git:
                 name, stat = file
                 if not name.startswith(this.path):
                     return False
-                if stat.get('insertions', 0) > 0:
+                if stat.get('lines', 0) > 0:
                     return True
                 return False
 
