@@ -33,6 +33,13 @@ def parse(filename):
             "bytes": 1000000,
             "count": 4,
             "filename": "build/pgv.log"
+        },
+        "vcs": {
+            "provider": "git"
+        },
+        "package": {
+            "format": "tar.gz",
+            "destination": "dist/pgv"
         }
     }
 

@@ -5,6 +5,7 @@ import tempfile
 import itertools
 import tarfile
 import logging
+import fnmatch
 from git import *
 
 
@@ -69,19 +70,26 @@ class Git:
             lambda x: x.change().files, itertools.imap(
                 lambda x: GitRevision(x), commits))
 
-    def export(self, dest, files, treeish=None):
+    def export(self, dest, files=None, treeish=None, include=None):
         buffer = io.BytesIO()
         logger.debug("extracting files from revision: %s", treeish)
         self.repo.archive(buffer, treeish=treeish, format='tar')
         buffer.seek(0, 0)
         logger.debug("unpacking files: %s", str(files))
         archive = tarfile.TarFile(fileobj=buffer)
-        files = set(archive.getnames()) & set(files)
-        files = map(archive.getmember, files)
-        archive.extractall(dest, members=files)
+        members = set([])
+        if files is not None:
+            members |= set(archive.getnames()) & set(files)
+        if include is not None:
+            for glob in include:
+                members |= set(fnmatch.filter(archive.getnames(), glob))
+        if not members:
+            members = archive.getname()
+        members = map(archive.getmember, members)
+        archive.extractall(dest, members=members)
 
     def __del__(self):
-        import shutil
         if os.path.isdir(self.repodir):
+            import shutil
             logger.debug("deleting temp directory: %s", self.repodir)
             shutil.rmtree(self.repodir)

@@ -20,8 +20,8 @@ def parse():
 
     def add_version(parser):
         g = parser.add_argument_group(title="version arguments")
-        g.add_argument('-f', '--from', dest="from_version", metavar="VERSION")
-        g.add_argument('-t', '--to', dest="to_version", metavar="VERSION")
+        g.add_argument('-f', '--from', dest="from_rev", metavar="REVISION")
+        g.add_argument('-t', '--to', dest="to_rev", metavar="REVISION")
 
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--help', action="help")
@@ -36,6 +36,7 @@ def parse():
     init.add_argument('--help', action="help")
     add_connection(init)
     make.add_argument('--help', action="help")
+    make.add_argument('-o', '--out')
     add_version(make)
     add_connection(make)
     install = commands.add_parser('install', add_help=False,
@@ -75,8 +76,31 @@ def setup_logging(config):
     logger.addHandler(consolehandler)
 
 
+def execute(config, args):
+    if args.command == "init":
+        raise NotImplemented()
+    elif args.command == "make":
+        import pgv.builder
+        builder = pgv.builder.Builder(config)
+        package = builder.make(from_rev=args.from_rev,
+                               to_rev=args.to_rev)
+        package.save(destination=args.out)
+    elif args.command == "install":
+        raise NotImplemented()
+    elif args.command == "skip":
+        raise NotImplemented()
+    else:
+        raise Exception("Unknown command: %s" % args.command)
+
+
 if __name__ == "__main__":
-    arguments = parse()
-    config = pgv.config.parse(arguments.config)
+    args = parse()
+    config = pgv.config.parse(args.config)
     setup_logging(config.logging)
     logger = logging.getLogger(__name__)
+    try:
+        execute(config, args)
+    except Exception, e:
+        logger.execption(e)
+        os._exit(1)
+    os._exit(0)
