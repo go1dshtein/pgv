@@ -8,7 +8,7 @@ class TestVSCGit(unittest.TestCase):
     def setUp(self):
         url = os.path.join(os.path.dirname(__file__), "..")
         self.fullrepo = pgv.vcs.Git(url="file://%s" % url)
-        self.repo = pgv.vcs.Git(url="file://%s" % url, path="test/data/sql")
+        self.repo = pgv.vcs.Git(url="file://%s" % url, path="test/data")
 
     def test_count_simple(self):
         self.assertTrue(len(list(self.fullrepo.revisions())) > 3)
@@ -39,7 +39,7 @@ class TestVSCGit(unittest.TestCase):
         revs = list(self.repo.revisions(revision=hash))
         files = revs[0].change().files
         self.assertTrue(
-            files == ['test/data/sql/schemas/private/functions/test.sql'])
+            files == ['test/data/schemas/private/functions/test.sql'])
 
     def test_change_export(self):
         hash = "ec53903436426b460fd5de84896fe6648bff7b2b"
@@ -50,20 +50,20 @@ class TestVSCGit(unittest.TestCase):
             self.assertTrue(os.listdir(tmp) == ['test'])
             self.assertTrue(os.listdir(os.path.join(tmp, 'test')) == ['data'])
             self.assertTrue(
-                os.listdir(os.path.join(tmp, 'test/data/sql')) == ['schemas'])
+                os.listdir(os.path.join(tmp, 'test/data')) == ['schemas'])
             self.assertTrue(
                 os.listdir(
-                    os.path.join(tmp, 'test/data/sql/schemas')) == ['private'])
+                    os.path.join(tmp, 'test/data/schemas')) == ['private'])
             self.assertTrue(
                 os.path.isfile(
                     os.path.join(
                         tmp,
-                        'test/data/sql/schemas/private/functions/test.sql')))
+                        'test/data/schemas/private/functions/test.sql')))
             orig = os.path.join(os.path.dirname(__file__),
                                 "data/sql/schemas/private/functions/test.sql")
             expr = os.path.join(
                 tmp,
-                "test/data/sql/schemas/private/functions/test.sql")
+                "test/data/schemas/private/functions/test.sql")
             with open(orig) as h:
                 orig = h.read()
             with open(expr) as h:
