@@ -1,14 +1,14 @@
 vcs:
-  type: git
-  url: file://.
-  path: test/data
+  provider: git
+  url: git@github.com:go1dshtein/pgv.git
+  prefix: test/data/sql
 package:
-  format: tar.gz
+  format: directory
   destination: dist/pgv
   always_include:
     - "schemas/*/type/*.sql"
 logging:
-  level: INFO
+  level: DEBUG
   filename: build/pgv.log
   bytes: 1000000
   count: 2

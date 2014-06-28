@@ -53,6 +53,12 @@ def parse():
     skip.add_argument('-f', '--filename',
                       help="skip only this filename",
                       action="append")
+    show = commands.add_parser('show', add_help=False,
+                               help="show revisions")
+    show.add_argument('--help', action="help")
+    show.add_argument('-s', '--skipped', action="store_true")
+    show.add_argument('-w', '--with-skipped', action="store_true")
+    add_version(show)
     return parser.parse_args()
 
 
@@ -88,7 +94,18 @@ def execute(config, args):
     elif args.command == "install":
         raise NotImplemented()
     elif args.command == "skip":
-        raise NotImplemented()
+        import pgv.skiplist
+        skiplist = pgv.skiplist.SkipList(config)
+        skiplist.add(args.revision, args.filename)
+    elif args.command == "show":
+        import pgv.viewer
+        viewer = pgv.viewer.Viewer(config)
+        if args.skipped:
+            viewer.show_skipped(args.to_rev)
+        else:
+            viewer.show(args.with_skipped,
+                        from_rev=args.from_rev,
+                        to_rev=args.to_rev)
     else:
         raise Exception("Unknown command: %s" % args.command)
 
@@ -101,6 +118,6 @@ if __name__ == "__main__":
     try:
         execute(config, args)
     except Exception, e:
-        logger.execption(e)
+        logger.exception(e)
         os._exit(1)
     os._exit(0)

@@ -98,3 +98,20 @@ class TestVSCGit(unittest.TestCase):
         finally:
             import shutil
             shutil.rmtree(tmp)
+
+    def test_revision_files(self):
+        repo = pgv.vcs.Git(url="file://%s" % self.url,
+                           prefix="test/data/sql",
+                           include=("schemas/*/types/*.sql",))
+        hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
+        rev = list(repo.revisions(revision=hash))[0]
+        self.assertEquals(
+            list(rev.files()),
+            ['schemas',
+             'schemas/private',
+             'schemas/public',
+             'schemas/private/functions',
+             'schemas/public/types',
+             'schemas/private/functions/test.sql',
+             'schemas/private/functions/test2.sql',
+             'schemas/public/types/data.sql'])

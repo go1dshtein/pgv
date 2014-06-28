@@ -34,7 +34,6 @@ class Git:
             def export(self, dest):
                 return this.export(dest,
                                    files=self.files,
-                                   include=this.include,
                                    treeish=self.hexsha)
 
         class GitRevision:
@@ -59,11 +58,27 @@ class Git:
                                    self.gitcommit.stats.files.viewitems())
                     files = map(lambda x: x[len(this.prefix):].lstrip('/'),
                                 dict(files).viewkeys())
+                    if not this.include is None:
+                        files = set(files)
+                        for pattern in this.include:
+                            files |= set(fnmatch.filter(self.files(), pattern))
+                        files = list(files)
                     self._change = GitChange(files, self.gitcommit.hexsha)
                 return self._change
 
+            def files(self):
+                files = itertools.imap(lambda y: y.path,
+                                       self.gitcommit.tree.traverse())
+                files = itertools.ifilter(
+                    lambda x: x.startswith(this.prefix), files)
+                files = itertools.imap(
+                    lambda x: x[len(this.prefix):].lstrip('/'), files)
+                return itertools.ifilter(lambda x: x, files)
+
         revisions = branch
         if begin is not None:
+            if end is None:
+                end = "HEAD"
             revisions = "%s...%s" % (begin, end)
         if begin == end:
             revisions = begin
@@ -75,6 +90,9 @@ class Git:
             lambda x: x.change().files, itertools.imap(
                 lambda x: GitRevision(x), commits))
 
+    def revision(self, revision):
+        return list(self.revisions(revision=revision))[0]
+
     def _get_archive(self, treeish):
         buffer = io.BytesIO()
         logger.debug("archiving files from revision: %s", treeish)
@@ -82,28 +100,25 @@ class Git:
         buffer.seek(0, 0)
         return tarfile.TarFile(fileobj=buffer)
 
-    def _get_members(self, archive, files, include):
+    def _get_members(self, archive, files):
         members = set([])
         if files is not None:
             files = map(lambda x: os.path.join(self.prefix, x), files)
-            logger.debug("unpacking files: %s", str(files))
             members |= set(archive.getnames()) & set(files)
-        if include is not None:
-            logger.debug("including files: %s", str(include))
-            for glob in include:
-                glob = os.path.join(self.prefix, glob)
-                members |= set(fnmatch.filter(archive.getnames(), glob))
-        if not members:
+        if not files:
             members = archive.getnames()
         logger.debug("files: %s", members)
         return map(archive.getmember, members)
 
     def _export_members(self, archive, members, dest):
         for member in members:
+            if not member.name.startswith(self.prefix):
+                continue
             name = member.name[len(self.prefix):].lstrip('/')
+            if not name:
+                continue
             if member.isdir():
-                logger.debug("extracting: directory: %s -> %s",
-                             member.name, name)
+                logger.debug("extracting: directory: %s -> %s", name, name)
                 directory = os.path.join(dest, name)
                 if not os.path.isdir(directory):
                     os.makedirs(directory)
@@ -112,17 +127,16 @@ class Git:
                 directory = os.path.dirname(filename)
                 if not os.path.isdir(directory):
                     os.makedirs(directory)
-                logger.debug("extracting: file: %s -> %s",
-                             member.name, name)
+                logger.debug("extracting: file: %s -> %s", name, filename)
                 with open(filename, 'wb') as h:
                     afile = archive.extractfile(member)
                     h.write(afile.read())
             else:
                 raise NotImplemented()
 
-    def export(self, dest, files=None, treeish=None, include=None):
+    def export(self, dest, files=None, treeish=None):
         archive = self._get_archive(treeish)
-        members = self._get_members(archive, files, include)
+        members = self._get_members(archive, files)
         self._export_members(archive, members, dest)
 
     def __del__(self):
@@ -130,3 +144,10 @@ class Git:
             import shutil
             logger.debug("deleting temp directory: %s", self.repodir)
             shutil.rmtree(self.repodir)
+
+
+def get(name, **kwargs):
+    if name == "git":
+        return Git(**kwargs)
+    else:
+        raise NotImplemented("Other vcs are not implemented yet")

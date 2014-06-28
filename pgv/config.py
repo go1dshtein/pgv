@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 
 try:
     import yaml
@@ -35,11 +36,13 @@ def parse(filename):
             "filename": "build/pgv.log"
         },
         "vcs": {
-            "provider": "git"
+            "provider": "git",
+            "prefix": ""
         },
         "package": {
             "format": "tar.gz",
-            "destination": "dist/pgv"
+            "destination": "dist/pgv",
+            "include_always": None
         }
     }
 
@@ -51,11 +54,12 @@ def parse(filename):
         result = []
         for pair in pairs:
             key, value = pair
-            for dkey, dvalue in default.viewitems():
-                if key == dkey:
-                    rvalue = dvalue
-                    rvalue.update(value)
-            result.append((key, value))
+            if key in default:
+                rvalue = copy.deepcopy(default[key])
+                rvalue.update(value.__dict__)
+                result.append((key, Config(rvalue)))
+            else:
+                result.append((key, value))
         dct = dict(result)
         return Config(dct)
 
