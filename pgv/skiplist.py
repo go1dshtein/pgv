@@ -26,7 +26,7 @@ class SkipList:
 
     def _parse(self, data):
         data = yaml.load(data)
-        return data.values()
+        return data
 
     def _read(self, filename):
         if os.path.isfile(filename):
@@ -54,7 +54,8 @@ class SkipList:
                 result |= set(files)
             logger.debug("adding to skiplist: %s", result)
             result |= set(skiplist.get(revision, []))
-            skiplist[revision] = list(result)
+            if result:
+                skiplist[revision] = list(result)
         self._save_local(skiplist)
 
     def load(self, rev=None):

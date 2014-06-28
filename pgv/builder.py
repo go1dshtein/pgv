@@ -21,6 +21,11 @@ class Builder:
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
     def _collect(self, package, revision, skipfiles):
+        if revision.change().files == [self.skiplist.name]:
+            logger.debug("revision %s contains only %s",
+                         revision.hash(),
+                         self.skiplist.name)
+            return
         package.revlist.append(revision.hash())
         directory = os.path.join(package.tmpdir, revision.hash())
         os.makedirs(directory)

@@ -27,7 +27,7 @@ class Viewer:
             for file in files:
                 if file in skipfiles:
                     if with_skipped:
-                        print "  -", file
+                        print " -", file
                 else:
                     print "  ", file
             print
@@ -42,4 +42,3 @@ class Viewer:
                 for file in skipfiles:
                     print "  ", file
                 print
-

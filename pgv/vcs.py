@@ -80,6 +80,8 @@ class Git:
             if end is None:
                 end = "HEAD"
             revisions = "%s...%s" % (begin, end)
+        elif end is not None and revision is None:
+            revision = end
         if begin == end:
             revisions = begin
         if revision is not None:
