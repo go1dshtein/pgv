@@ -2,11 +2,11 @@ vcs:
   provider: git
   url: git@github.com:go1dshtein/pgv.git
   prefix: test/data/sql
+  include:
+    - "schemas/*/types/*.sql"
 package:
   format: directory
-  destination: dist/pgv
-  always_include:
-    - "schemas/*/type/*.sql"
+  path: dist/pgv
 logging:
   level: DEBUG
   filename: build/pgv.log

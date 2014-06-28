@@ -20,7 +20,7 @@ class SkipList:
             self.vcs = pgv.vcs.get(config.vcs.provider,
                                    url=config.vcs.url,
                                    prefix=config.vcs.prefix,
-                                   include=config.package.include_always)
+                                   include=config.vcs.include)
 
         self.prefix = self.vcs.prefix
 
@@ -38,7 +38,7 @@ class SkipList:
 
     def _save_local(self, data):
         filename = os.path.join(self.prefix, self.name)
-        data = yaml.dump(data)
+        data = yaml.dump(data, default_flow_style=False)
         with open(filename, "w") as h:
             h.write(data)
 

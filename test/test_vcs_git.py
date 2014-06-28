@@ -115,3 +115,14 @@ class TestVSCGit(unittest.TestCase):
              'schemas/private/functions/test.sql',
              'schemas/private/functions/test2.sql',
              'schemas/public/types/data.sql'])
+
+    def test_skiplist_only(self):
+        repo = pgv.vcs.Git(url="file://%s" % self.url,
+                           prefix="test/data/sql",
+                           include=("schemas/*/types/*.sql",))
+        hash1 = "edf79e098b6321ffa118085fcb2b5776953a314b"
+        rev = list(repo.revisions(revision=hash1))[0]
+        self.assertTrue(rev.skiplist_only())
+        hash2 = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
+        rev = list(repo.revisions(revision=hash2))[0]
+        self.assertFalse(rev.skiplist_only())

@@ -1,29 +1,7 @@
 import json
 import os
 import copy
-
-try:
-    import yaml
-    use_yaml = True
-except ImportError:
-    use_yaml = False
-
-
-def check_filename(filename):
-    basename, ext = os.path.splitext(filename)
-    if os.path.isfile(filename):
-        return filename
-    else:
-        # try to another extension
-        if ext == ".json":
-            filename = basename + ".yaml"
-            if os.path.isfile(filename):
-                return filename
-        if ext == ".yaml":
-            filename = basename + ".json"
-            if os.path.isfile(filename):
-                return filename
-        raise OSError("No such file or directory: %s", filename)
+import yaml
 
 
 def parse(filename):
@@ -42,7 +20,7 @@ def parse(filename):
         "package": {
             "format": "tar.gz",
             "destination": "dist/pgv",
-            "include_always": None
+            "include": None
         }
     }
 
@@ -63,14 +41,9 @@ def parse(filename):
         dct = dict(result)
         return Config(dct)
 
-    filename = check_filename(filename)
     with open(filename) as h:
         data = h.read()
-
-    if filename.endswith(".yaml"):
-        if not use_yaml:
-            raise Exception("Could not use yaml - module not found")
-        data = json.dumps(yaml.load(data))
+    data = json.dumps(yaml.load(data))
 
     result = json.loads(data, object_pairs_hook=hook)
     for dkey, dvalue in default.viewitems():

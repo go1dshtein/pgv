@@ -8,6 +8,8 @@ import logging
 import fnmatch
 from git import *
 
+import pgv.skiplist
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,15 +33,20 @@ class Git:
                 self.files = files
                 self.hexsha = hexsha
 
-            def export(self, dest):
+            def export(self, dest, skipfiles=None):
+                if skipfiles is None:
+                    files = set(self.files)
+                else:
+                    files = set(self.files) - set(skipfiles)
                 return this.export(dest,
-                                   files=self.files,
+                                   files=list(files),
                                    treeish=self.hexsha)
 
         class GitRevision:
             def __init__(self, gitcommit):
                 self.gitcommit = gitcommit
                 self._change = None
+                self._skiplist_only = False
 
             def hash(self):
                 return self.gitcommit.hexsha
@@ -58,6 +65,8 @@ class Git:
                                    self.gitcommit.stats.files.viewitems())
                     files = map(lambda x: x[len(this.prefix):].lstrip('/'),
                                 dict(files).viewkeys())
+                    if files == [pgv.skiplist.SkipList.name]:
+                        self._skiplist_only = True
                     if not this.include is None:
                         files = set(files)
                         for pattern in this.include:
@@ -74,6 +83,9 @@ class Git:
                 files = itertools.imap(
                     lambda x: x[len(this.prefix):].lstrip('/'), files)
                 return itertools.ifilter(lambda x: x, files)
+
+            def skiplist_only(self):
+                return self._skiplist_only
 
         revisions = branch
         if begin is not None:

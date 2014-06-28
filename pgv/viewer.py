@@ -9,7 +9,7 @@ class Viewer:
         self.vcs = pgv.vcs.get(config.vcs.provider,
                                url=config.vcs.url,
                                prefix=config.vcs.prefix,
-                               include=config.package.include_always)
+                               include=config.vcs.include)
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
     def show(self, with_skipped, from_rev=None, to_rev=None):
@@ -22,7 +22,7 @@ class Viewer:
                     continue
                 else:
                     skipfiles = set(skiplist[revision.hash()])
-            print revision.hash()
+            print revision.hash(), "[s]" if revision.skiplist_only() else ""
             files = revision.change().files
             for file in files:
                 if file in skipfiles:
