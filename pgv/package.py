@@ -28,7 +28,7 @@ class RevList:
         self.revisions = yaml.load(data)
 
     def __iter__(self):
-        return self.revisions.viewkeys()
+        return self.revisions.viewkeys().__iter__()
 
     def get_meta(self, revision):
         return self.revisions[revision]
@@ -51,8 +51,7 @@ class Package:
         "stop"
     }
 
-    def __init__(self, format, path=None):
-        self.path = path
+    def __init__(self, format):
         self.tmpdir = tempfile.mkdtemp(prefix="pgv-package")
         self.revlist = RevList(self.tmpdir)
         self.format = format
@@ -80,7 +79,7 @@ class Package:
 
         scripts = fnmatch.filter(self._get_files(self.tmpdir),
                                  "*/%s/*" % self.scripts_dir)
-        scripts = itertools.ifilter_false(check_scripts_filter,)
+        scripts = itertools.ifilterfalse(check_scripts_filter, scripts)
         for script in scripts:
             logger.warning("script %s has unknown event name",
                            script[len(self.tmpdir):].lstrip('/'))
@@ -109,7 +108,11 @@ class Package:
         directory = os.path.join(self.tmpdir, revision, self.scripts_dir)
         if not os.path.isdir(directory):
             return []
-        result = filter(self._filter_event, self._get_files(directory))
+
+        def filter_event(filename):
+            return self._filter_event(filename, event)
+
+        result = filter(filter_event, self._get_files(directory))
         return result
 
     def schemas(self, revision):
@@ -120,7 +123,7 @@ class Package:
             lambda x: os.path.isdir(os.path.join(directory, x)),
             os.listdir(directory))
 
-    def schema_files(self, revisison, schema):
+    def schema_files(self, revision, schema):
         directory = os.path.join(self.tmpdir, revision,
                                  self.schemas_dir, schema)
         if not os.path.isdir(directory):
