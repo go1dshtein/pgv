@@ -16,6 +16,7 @@ def parse(filename):
         "vcs": {
             "provider": "git",
             "prefix": ""
+            "url":  "file://%s" % os.path.dirname(filename)
         },
         "package": {
             "format": "tar.gz",
