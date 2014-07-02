@@ -11,17 +11,17 @@ def parse(filename):
             "level": "INFO",
             "bytes": 1000000,
             "count": 4,
-            "filename": "build/pgv.log"
+            "filename": "build/pgv.log",
         },
         "vcs": {
             "provider": "git",
-            "prefix": ""
-            "url":  "file://%s" % os.path.dirname(filename)
+            "prefix": "",
+            "url":  "file://%s" % os.path.dirname(filename),
+            "include": None,
         },
         "package": {
             "format": "tar.gz",
             "destination": "dist/pgv",
-            "include": None
         }
     }
 
