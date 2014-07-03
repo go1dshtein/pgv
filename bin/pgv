@@ -34,6 +34,8 @@ def parse():
     init = commands.add_parser('init', add_help=False,
                                help="init versioning in database")
     init.add_argument('--help', action="help")
+    init.add_argument('-o', '--overwrite', action="store_true",
+                      help="overwrite if schema exists")
     add_connection(init)
     make.add_argument('--help', action="help")
     make.add_argument('-o', '--out')
