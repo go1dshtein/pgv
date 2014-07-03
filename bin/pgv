@@ -3,6 +3,7 @@ import argparse
 import logging
 import logging.handlers
 import os
+import getpass
 import pgv.config
 
 
@@ -14,9 +15,9 @@ def parse():
         g.add_argument('-p', '--port')
         g.add_argument('-U', '--username')
         g.add_argument('-w', '--no-password', dest="prompt_password",
-                       action="store_false", default=True)
+                       action="store_false", default=False)
         g.add_argument('-W', '--password', dest="prompt_password",
-                       action="store_true")
+                       action="store_true", default=False)
 
     def add_version(parser):
         g = parser.add_argument_group(title="version arguments")
@@ -84,9 +85,26 @@ def setup_logging(config):
     logger.addHandler(consolehandler)
 
 
+def get_connection_string(args):
+    result = ""
+    if args.dbname:
+        result += "dbname=%s " % args.dbname
+    if args.host:
+        result += "host=%s " % args.host
+    if args.port:
+        result += "port=%d " % args.port
+    if args.username:
+        result += "user=%s " % args.username
+    if args.prompt_password:
+        result += "password=%s" % getpass.getpass("Password: ")
+    return result
+
+
 def execute(config, args):
     if args.command == "init":
-        raise NotImplemented()
+        import pgv.installer
+        initializer = pgv.installer.Initializer(get_connection_string(args))
+        initializer.initialize(args.overwrite)
     elif args.command == "make":
         import pgv.builder
         builder = pgv.builder.Builder(config)

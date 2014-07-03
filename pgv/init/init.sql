@@ -1,4 +1,4 @@
-drop schema pgv cascade;
+drop schema if exists pgv cascade;
 
 create schema pgv;
 
