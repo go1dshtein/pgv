@@ -8,7 +8,7 @@ class TestSkipList(unittest.TestCase):
     def setUp(self):
         self.url = os.path.join(os.path.dirname(__file__), "..")
         self.repo = pgv.vcs.Git(url="file://%s" % self.url,
-                                prefix="test/data/sql")
+                                prefix="tests/data/sql")
 
     def test_read(self):
         skiplist = pgv.skiplist.SkipList(None, vcs=self.repo)
@@ -31,7 +31,9 @@ class TestSkipList(unittest.TestCase):
             ["schemas/public/types/data.sql"])
 
     def test_read_rev(self):
-        skiplist = pgv.skiplist.SkipList(None, vcs=self.repo)
+        repo = pgv.vcs.Git(url="file://%s" % self.url,
+                           prefix="test/data/sql")
+        skiplist = pgv.skiplist.SkipList(None, vcs=repo)
         skips = skiplist.load("edf79e098b6321ffa118085fcb2b5776953a314b")
         self.assertEquals(
             skips.keys(),
@@ -67,14 +69,14 @@ class TestSkipList(unittest.TestCase):
             self.assertEquals(
                 result,
                 {
-                    '0c0cf8b1f385af6f991a127cfd5ac2272b95d459':
+                    'cdfdbfb2bdcf8ee2dbf190bbf3a73ffbd77bd9b3':
                     ['schemas/private/functions/test.sql'],
                     '731f7793bbb2c73b1cd9b9de853ac8fc0964e73f':
                     ['schemas/public/types/data.sql']
                 })
         skiplist._save_local = save_hook
 
-        skiplist.add("0c0cf8b1f385af6f991a127cfd5ac2272b95d459",
+        skiplist.add("cdfdbfb2bdcf8ee2dbf190bbf3a73ffbd77bd9b3",
                      ["schemas/private/functions/test.sql"])
 
     def test_add_files_empty(self):
@@ -89,5 +91,5 @@ class TestSkipList(unittest.TestCase):
                 })
         skiplist._save_local = save_hook
 
-        skiplist.add("0c0cf8b1f385af6f991a127cfd5ac2272b95d459",
+        skiplist.add("cdfdbfb2bdcf8ee2dbf190bbf3a73ffbd77bd9b3",
                      ["schemas/private/functions/test.sql1"])

@@ -1,7 +1,7 @@
 vcs:
   provider: git
   url: git@github.com:go1dshtein/pgv.git
-  prefix: test/data/sql
+  prefix: tests/data/sql
   include:
     - "schemas/*/types/*.sql"
 package:
