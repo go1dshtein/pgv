@@ -17,8 +17,10 @@ class Builder:
                                include=config.vcs.include)
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
-    def make(self, from_rev=None, to_rev=None):
-        package = pgv.package.Package(self.config.package.format)
+    def make(self, from_rev=None, to_rev=None, format=None):
+        if format is None:
+            format = self.config.package.format
+        package = pgv.package.Package(format)
         skiplist = self.skiplist.load(to_rev)
         revlist = list(self.vcs.revisions(begin=from_rev, end=to_rev))
         for revision in reversed(revlist):

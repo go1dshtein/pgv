@@ -1,150 +1,18 @@
 #!/usr/bin/env python2.7
-import argparse
 import logging
-import logging.handlers
 import os
-import getpass
 import pgv.config
-
-
-def parse():
-    def add_connection(parser, required=False):
-        g = parser.add_argument_group(title="database connection arguments")
-        g.add_argument('-d', '--dbname', required=required)
-        g.add_argument('-h', '--host')
-        g.add_argument('-p', '--port')
-        g.add_argument('-U', '--username')
-        g.add_argument('-w', '--no-password', dest="prompt_password",
-                       action="store_false", default=False)
-        g.add_argument('-W', '--password', dest="prompt_password",
-                       action="store_true", default=False)
-
-    def add_version(parser):
-        g = parser.add_argument_group(title="version arguments")
-        g.add_argument('-f', '--from', dest="from_rev", metavar="REVISION")
-        g.add_argument('-t', '--to', dest="to_rev", metavar="REVISION")
-
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--help', action="help")
-    parser.add_argument('-c', '--config', metavar="FILENAME",
-                        default=os.path.join(os.getcwd(), ".pgv"),
-                        help="main configuration file")
-    commands = parser.add_subparsers(dest="command")
-    make = commands.add_parser('make', add_help=False,
-                               help="make schema package")
-    init = commands.add_parser('init', add_help=False,
-                               help="init versioning in database")
-    init.add_argument('--help', action="help")
-    init.add_argument('-o', '--overwrite', action="store_true",
-                      help="overwrite if schema exists")
-    add_connection(init)
-    make.add_argument('--help', action="help")
-    make.add_argument('-o', '--out')
-    add_version(make)
-    add_connection(make)
-    install = commands.add_parser('install', add_help=False,
-                                  help="install schema package to database")
-    install.add_argument('--help', action="help")
-    install.add_argument('--devel', action="store_true",
-                         help="install schema from working directory")
-    add_version(install)
-    add_connection(install, True)
-    skip = commands.add_parser('skip', add_help=False,
-                               help="skip revision from package")
-    skip.add_argument('--help', action="help")
-    skip.add_argument('revision')
-    skip.add_argument('-f', '--filename',
-                      help="skip only this filename",
-                      action="append")
-    show = commands.add_parser('show', add_help=False,
-                               help="show revisions")
-    show.add_argument('--help', action="help")
-    show.add_argument('-s', '--skipped', action="store_true")
-    show.add_argument('-w', '--with-skipped', action="store_true")
-    add_version(show)
-    return parser.parse_args()
-
-
-def setup_logging(config):
-    directory = os.path.dirname(config.filename)
-    if not os.path.isdir(directory):
-        os.makedirs(directory)
-    logger = logging.getLogger('')  # root logger
-    logger.setLevel(config.level)
-    filehandler = logging.handlers.RotatingFileHandler(
-        config.filename, maxBytes=config.bytes, backupCount=config.count)
-    filehandler.setLevel(config.level)
-    fileformatter = logging.Formatter(
-        "%(asctime)s: %(levelname)-7s: %(name)-12s: %(lineno)-3d: %(message)s")
-    filehandler.setFormatter(fileformatter)
-    logger.addHandler(filehandler)
-    consolehandler = logging.StreamHandler()
-    consolehandler.setLevel(logging.INFO)
-    consoleformatter = logging.Formatter("%(message)s")
-    consolehandler.setFormatter(consoleformatter)
-    logger.addHandler(consolehandler)
-
-
-def get_connection_string(args):
-    result = ""
-    if args.dbname:
-        result += "dbname=%s " % args.dbname
-    if args.host:
-        result += "host=%s " % args.host
-    if args.port:
-        result += "port=%d " % args.port
-    if args.username:
-        result += "user=%s " % args.username
-    if args.prompt_password:
-        result += "password=%s" % getpass.getpass("Password: ")
-    return result
-
-
-def execute(config, args):
-    if args.command == "init":
-        import pgv.installer
-        initializer = pgv.installer.Initializer(get_connection_string(args))
-        initializer.initialize(args.overwrite)
-    elif args.command == "make":
-        import pgv.builder
-        builder = pgv.builder.Builder(config)
-        package = builder.make(from_rev=args.from_rev,
-                               to_rev=args.to_rev)
-        path = args.out
-        if path is None:
-            path = config.package.path
-        package.save(path)
-    elif args.command == "install":
-        import pgv.installer
-        import pgv.package
-        installer = pgv.installer.Installer(get_connection_string(args))
-        package = pgv.package.Package(config.package.format)
-        package.load(config.package.path)
-        installer.install(package)
-    elif args.command == "skip":
-        import pgv.skiplist
-        skiplist = pgv.skiplist.SkipList(config)
-        skiplist.add(args.revision, args.filename)
-    elif args.command == "show":
-        import pgv.viewer
-        viewer = pgv.viewer.Viewer(config)
-        if args.skipped:
-            viewer.show_skipped(args.to_rev)
-        else:
-            viewer.show(args.with_skipped,
-                        from_rev=args.from_rev,
-                        to_rev=args.to_rev)
-    else:
-        raise Exception("Unknown command: %s" % args.command)
+import pgv.utils
+import pgv.argparser
 
 
 if __name__ == "__main__":
-    args = parse()
+    args = pgv.argparser.Parser().parse()
     config = pgv.config.parse(args.config)
-    setup_logging(config.logging)
+    pgv.utils.setup_logging(config.logging)
     logger = logging.getLogger(__name__)
     try:
-        execute(config, args)
+        pgv.utils.execute(config, args)
     except Exception, e:
         logger.exception(e)
         os._exit(1)

@@ -113,22 +113,23 @@ class Package:
             return self._filter_event(filename, event)
 
         result = filter(filter_event, self._get_files(directory))
-        return result
+        return sorted(result)
 
     def schemas(self, revision):
         directory = os.path.join(self.tmpdir, revision, self.schemas_dir)
         if not os.path.isdir(directory):
             return []
-        return filter(
+        result = filter(
             lambda x: os.path.isdir(os.path.join(directory, x)),
             os.listdir(directory))
+        return sorted(result)
 
     def schema_files(self, revision, schema):
         directory = os.path.join(self.tmpdir, revision,
                                  self.schemas_dir, schema)
         if not os.path.isdir(directory):
             return []
-        return self._get_files(directory)
+        return sorted(self._get_files(directory))
 
     def add(self, revision, skipfiles=None):
         if revision.skiplist_only():
