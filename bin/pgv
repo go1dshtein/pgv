@@ -27,7 +27,7 @@ def parse():
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--help', action="help")
     parser.add_argument('-c', '--config', metavar="FILENAME",
-                        default=os.path.join(os.getcwd(), ".pgv.yaml"),
+                        default=os.path.join(os.getcwd(), ".pgv"),
                         help="main configuration file")
     commands = parser.add_subparsers(dest="command")
     make = commands.add_parser('make', add_help=False,
@@ -110,12 +110,17 @@ def execute(config, args):
         builder = pgv.builder.Builder(config)
         package = builder.make(from_rev=args.from_rev,
                                to_rev=args.to_rev)
-        destination = args.out
-        if destination is None:
-            destination = config.package.path
-        package.save(destination=destination)
+        path = args.out
+        if path is None:
+            path = config.package.path
+        package.save(path)
     elif args.command == "install":
-        raise NotImplemented()
+        import pgv.installer
+        import pgv.package
+        installer = pgv.installer.Installer(get_connection_string(args))
+        package = pgv.package.Package(config.package.format)
+        package.load(config.package.path)
+        installer.install(package)
     elif args.command == "skip":
         import pgv.skiplist
         skiplist = pgv.skiplist.SkipList(config)

@@ -19,10 +19,16 @@ class Viewer:
             skipfiles = set([])
             if revision.hash() in skiplist:
                 if skiplist[revision.hash()] is None:
-                    continue
+                    if with_skipped:
+                        print revision.hash()
+                        skipfiles = revision.change().files
+                    else:
+                        continue
                 else:
                     skipfiles = set(skiplist[revision.hash()])
-            print revision.hash(), "[s]" if revision.skiplist_only() else ""
+            else:
+                print revision.hash(), "[s]" if \
+                    revision.skiplist_only() else ""
             files = revision.change().files
             for file in files:
                 if file in skipfiles:
@@ -36,7 +42,7 @@ class Viewer:
         skiplist = self.skiplist.load(to_rev)
         for revision, skipfiles in skiplist.viewitems():
             print revision
-            if skiplist is None:
+            if skipfiles is None:
                 print "  [ALL]"
             else:
                 for file in skipfiles:

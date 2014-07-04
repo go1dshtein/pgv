@@ -4,6 +4,8 @@ vcs:
   prefix: tests/data/sql
   include:
     - "schemas/*/types/*.sql"
+database:
+  isolation_level: autocommit
 package:
   format: directory
   path: dist/pgv

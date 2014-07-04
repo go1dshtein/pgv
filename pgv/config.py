@@ -11,7 +11,8 @@ def parse(filename):
             "level": "INFO",
             "bytes": 1000000,
             "count": 4,
-            "filename": "build/pgv.log",
+            "filename": os.path.join(os.path.dirname(filename),
+                                     "build/pgv.log"),
         },
         "vcs": {
             "provider": "git",
@@ -21,7 +22,10 @@ def parse(filename):
         },
         "package": {
             "format": "tar.gz",
-            "destination": "dist/pgv",
+            "path": os.path.join(os.path.dirname(filename), "dist/pgv"),
+        },
+        "database": {
+            "isolation_level": "autocommit"
         }
     }
 
@@ -41,6 +45,8 @@ def parse(filename):
                 result.append((key, value))
         dct = dict(result)
         return Config(dct)
+
+    os.chdir(os.path.dirname(filename))
 
     with open(filename) as h:
         data = h.read()

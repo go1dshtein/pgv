@@ -23,13 +23,27 @@ create table if not exists pgv.scripts(
   error text not null default ''
 );
 
+create or replace function pgv.is_installed(p_revision text)
+returns bigint as $$
+  declare
+    o_result bigint;
+  begin
+    select revisions_id
+      into o_result
+      from pgv.revisions
+     where revision = p_revision;
+    return o_result;
+  end;
+$$
+language plpgsql
+strict;
 
 create or replace function pgv.run(p_script text)
 returns bigint as $$
   declare
     o_scripts_id bigint;
   begin
-    insert into pgv.scripts (script, stop) values (p_scripts, null) returning scripts_id into o_scripts_id;
+    insert into pgv.scripts (script, stop) values (p_script, null) returning scripts_id into o_scripts_id;
     return o_scripts_id;
   end;
 $$
@@ -68,5 +82,11 @@ returns bigint as $$
     return o_revisions_id;
   end;
 
+$$
+language plpgsql;
+
+create or replace function pgv.revision()
+return character(127) as $$
+  return query select revision from pgv.revisions order by revisions_id desc limit 1;
 $$
 language plpgsql;
