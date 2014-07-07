@@ -5,8 +5,9 @@ import pgv.config
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        pwd = os.path.dirname(__file__)
-        self.yaml_file = os.path.join(pwd, "data", "config", "config.yaml")
+        self.pwd = os.path.dirname(__file__)
+        self.yaml_file = os.path.join(self.pwd, "data",
+                                      "config", "config.yaml")
 
     def test_read_yaml(self):
         config = pgv.config.parse(self.yaml_file)
@@ -20,3 +21,6 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(config.logging.level == "INFO")
         self.assertTrue(config.logging.bytes == 1000000)
         self.assertTrue(config.logging.count == 4)
+
+    def tearDown(self):
+        os.chdir(os.path.join(self.pwd, ".."))
