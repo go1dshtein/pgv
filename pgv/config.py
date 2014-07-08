@@ -5,6 +5,8 @@ import yaml
 
 
 def parse(filename):
+    dirname = os.path.dirname(filename) if filename else os.getcwd()
+    os.chdir(dirname)
 
     default = {
         "logging": {
@@ -16,7 +18,7 @@ def parse(filename):
         "vcs": {
             "provider": "git",
             "prefix": "",
-            "url":  "file://%s" % os.path.dirname(filename),
+            "url":  "file://%s" % dirname,
             "include": None,
         },
         "package": {
@@ -28,31 +30,27 @@ def parse(filename):
         }
     }
 
+    if filename:
+        with open(filename) as h:
+            data = yaml.load(h.read())
+    else:
+        data = default
+
     class Config:
         def __init__(self, dct):
             self.__dict__ = dct
 
     def hook(pairs):
         result = []
-        for pair in pairs:
-            key, value = pair
-            if key in default:
-                rvalue = copy.deepcopy(default[key])
-                rvalue.update(value.__dict__)
-                result.append((key, Config(rvalue)))
+        for section, config in pairs:
+            if section in default:
+                for key, value in default[section]:
+                    config.__dict__.setdefault(key, dvalue)
             else:
-                result.append((key, value))
-        dct = dict(result)
-        return Config(dct)
+                result.append((section, config))
+        return Config(dict(result))
 
-    os.chdir(os.path.dirname(filename))
-
-    with open(filename) as h:
-        data = h.read()
-    data = json.dumps(yaml.load(data))
-
-    result = json.loads(data, object_pairs_hook=hook)
-    for dkey, dvalue in default.viewitems():
-        if dkey not in result.__dict__:
-            result.__dict__[dkey] = Config(dvalue)
+    result = json.loads(json.dumps(data), object_pairs_hook=hook)
+    for section, config in default.viewitems():
+        result.__dict__.setdefault(section, Config(config))
     return result

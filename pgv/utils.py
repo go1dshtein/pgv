@@ -95,3 +95,17 @@ def execute(config, args):
                         to_rev=args.to_rev)
     else:
         raise Exception("Unknown command: %s" % args.command)
+
+
+def search_config(filename):
+    if not filename is None and os.path.isfile(filename):
+        return filename
+
+    filename = os.path.join(os.getcwd(), ".pgv")
+    while not os.path.isfile(filename):
+        dirname = os.path.dirname(filename)
+        if dirname == "/":
+            return None
+        filename = os.path.join(dirname, "..", ".pgv")
+        filename = os.path.realpath(filename)
+    return filename

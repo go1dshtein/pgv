@@ -1,19 +1,20 @@
 #!/usr/bin/env python2.7
-import logging
 import os
+import logging
 import pgv.config
 import pgv.utils
 import pgv.argparser
 
 
 if __name__ == "__main__":
-    args = pgv.argparser.Parser().parse()
-    config = pgv.config.parse(args.config)
-    pgv.utils.setup_logging(config.logging)
-    logger = logging.getLogger(__name__)
     try:
-        pgv.utils.execute(config, args)
+        logging.basicConfig(format="%(message)s", level="INFO")
+        logger = logging
+        options = pgv.argparser.parse()
+        config = pgv.config.parse(options.config)
+        pgv.utils.setup_logging(config.logging)
+        logger = logging.getLogger(__name__)
+        pgv.utils.execute(config, options)
     except Exception, e:
         logger.exception(e)
         os._exit(1)
-    os._exit(0)

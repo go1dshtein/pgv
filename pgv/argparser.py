@@ -6,8 +6,8 @@ class Parser:
     def __init__(self):
         self.parser = argparse.ArgumentParser(add_help=False)
         self.parser.add_argument('--help', action="help")
-        self.parser.add_argument('-c', '--config', metavar="FILENAME",
-                                 default=os.path.join(os.getcwd(), ".pgv"),
+        self.parser.add_argument('-c', '--config', metavar="CONFIG",
+                                 default=None,
                                  help="main configuration file")
         self.commands = self.parser.add_subparsers(dest="command")
         self.add_init()
@@ -118,5 +118,6 @@ class Parser:
         show.add_argument('-w', '--with-skipped', action="store_true")
         self.add_version(show)
 
-    def parse(self, args=None):
-        return self.parser.parse_args(args=args)
+
+def parse(args=None):
+    return Parser().parser.parse_args(args=args)
