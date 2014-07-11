@@ -97,8 +97,8 @@ def execute(config, args):
         raise Exception("Unknown command: %s" % args.command)
 
 
-def search_config(filename):
-    if not filename is None and os.path.isfile(filename):
+def search_config(filename=None):
+    if filename is not None:
         return filename
 
     filename = os.path.join(os.getcwd(), ".pgv")

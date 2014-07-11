@@ -87,7 +87,6 @@ class Parser:
         install.add_argument('--devel', action="store_true",
                              help="install schema from working directory")
         self.add_package(install)
-        #self.add_version(install)
         self.add_connection(install, True)
 
     def add_skip(self):
