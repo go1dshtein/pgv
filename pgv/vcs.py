@@ -112,6 +112,7 @@ class Git:
                 lambda x: GitRevision(x), commits))
 
     def revision(self, revision):
+        revision = self.parse(revision)
         return list(self.revisions(revision=revision))[0]
 
     def _get_archive(self, treeish):

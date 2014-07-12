@@ -126,3 +126,15 @@ class TestVSCGit(unittest.TestCase):
         hash2 = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
         rev = list(repo.revisions(revision=hash2))[0]
         self.assertFalse(rev.skiplist_only())
+
+    def test_branch_unmerged(self):
+        repo = pgv.vcs.Git(url="file://%s" % self.url,
+                           prefix="tests/data/sql",
+                           include=("schemas/*/types/*.sql",))
+        hash1 = "master"
+        hash2 = "testbranch"
+        master_revs = set(map(lambda x: x.hash(), repo.revisions(end=hash1)))
+        test_revs = set(map(lambda x: x.hash(), repo.revisions(end=hash2)))
+        self.assertEquals(
+            list(test_revs - master_revs),
+            ['3d812316a65965f8a93caf9292c7ee15ca12e3e4'])
