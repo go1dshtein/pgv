@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import pgv.utils
 
@@ -48,17 +49,21 @@ class Application:
 
     def show(self):
         import pgv.viewer
-        viewer = pgv.viewer.Viewer(config)
+        viewer = pgv.viewer.Viewer(self.config)
         if self.options.skipped:
             viewer.show_skipped(self.options.to_rev)
         else:
             viewer.show(self.options.with_skipped,
                         from_rev=self.options.from_rev,
-                        to_rev=sellf.options.to_rev)
+                        to_rev=self.options.to_rev)
 
     def run(self, command):
+        logger.debug("begin")
+        logger.debug("arguments: %s", " ".join(sys.argv))
         try:
             getattr(self, command)()
         except AttributeError, e:
             logging.error("Unknown command: %s", command)
             raise
+        finally:
+            logger.debug("end\n\n")

@@ -9,8 +9,8 @@ import pgv.app
 
 def main():
     try:
-        logging.basicConfig(format="%(message)s", level="INFO")
-        logger = logging
+        #logging.basicConfig(format="%(message)s", level="INFO")
+        #logger = logging
         options = pgv.argparser.parse()
         config = pgv.config.parse(pgv.utils.search_config(options.config))
         pgv.utils.setup_logging(config.logging)

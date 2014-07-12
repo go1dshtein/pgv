@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 class Installer:
     schema = "pgv"
+    events = type("E", (object,), pgv.package.Package.events)
 
     def __init__(self, constring, isolation_level=None):
         logger.debug("connection string: %s", constring)
@@ -16,9 +17,12 @@ class Installer:
         logger.debug("isolation level: %s", isolation_level)
         self.connection = psycopg2.connect(constring)
         self.connection.set_isolation_level(isolation_level)
-        self.metaconn = psycopg2.connect(constring)
-        self.metaconn.set_isolation_level(
-            psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        if isolation_level != psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT:
+            self.metaconn = psycopg2.connect(constring)
+            self.metaconn.set_isolation_level(
+                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        else:
+            self.metaconn = self.connection
 
     def _get_text(self, filename):
         with open(filename) as h:
@@ -68,7 +72,7 @@ class Installer:
             for schema in package.schemas(revision):
                 logger.info("  installing schema %s", schema)
                 try:
-                    self._run_scripts(package, revision, "pre")
+                    self._run_scripts(package, revision, self.events.pre)
                     for filename in package.schema_files(revision, schema):
                         try:
                             script = self._get_text(filename)
@@ -77,15 +81,17 @@ class Installer:
                             cursor.execute(script)
                             logger.debug("status: \n%s", cursor.statusmessage)
                         except:
-                            self._run_scripts(package, revision, "error")
+                            self._run_scripts(package, revision,
+                                              self.events.error)
                             raise
                         else:
-                            self._run_scripts(package, revision, "success")
+                            self._run_scripts(package, revision,
+                                              self.events.success)
                 except:
-                    self._run_scripts(package, revision, "post")
+                    self._run_scripts(package, revision, self.events.post)
                     raise
                 else:
-                    self._run_scripts(package, revision, "post")
+                    self._run_scripts(package, revision, self.events.post)
                     logger.info("  done")
 
     def install(self, package):
@@ -95,13 +101,15 @@ class Installer:
                 continue
             logger.info("installing revision %s", revision)
             try:
-                self._run_scripts(package, revision, "start")
+                self._run_scripts(package, revision, self.events.start)
                 self._run_schemas(package, revision)
             except:
-                self._run_scripts(package, revision, "stop")
+                self._run_scripts(package, revision, self.events.stop)
                 raise
             else:
-                self._run_scripts(package, revision, "stop")
+                self._run_scripts(package, revision, self.events.stop)
+                if not self.connection.autocommit:
+                    self.connection.commit()
                 self._meta_commit(revision)
                 logger.info("done\n")
 

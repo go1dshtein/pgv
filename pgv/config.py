@@ -2,19 +2,20 @@ import json
 import os
 import copy
 import yaml
+import re
 
 
 def parse(filename):
-    dirname = os.path.dirname(filename) if filename else os.getcwd()
+    pattern = re.compile(r"\$(\w+)", re.U)
     filename = os.path.realpath(filename) if filename else filename
-    os.chdir(dirname)
+    dirname = os.path.dirname(filename) if filename else os.getcwd()
 
     default = {
         "logging": {
             "level": "INFO",
             "bytes": 1000000,
             "count": 4,
-            "filename": "build/pgv.log",
+            "filename": os.path.join(os.getcwd(), "build", "pgv.log"),
         },
         "vcs": {
             "provider": "git",
@@ -24,7 +25,7 @@ def parse(filename):
         },
         "package": {
             "format": "tar.gz",
-            "path": "dist/pgv",
+            "path": os.path.join(os.getcwd(), "dist", "pgv"),
         },
         "database": {
             "isolation_level": "autocommit"
@@ -41,17 +42,27 @@ def parse(filename):
         def __init__(self, dct):
             self.__dict__ = dct
 
+        def __repr__(self):
+            return self.__dict__.__repr__()
+
     def hook(pairs):
         result = []
         for section, config in pairs:
+            if isinstance(config, basestring):
+                variables = pattern.findall(config)
+                subs = map(lambda x: (x, os.getenv(x, "")), variables)
+                for match, repl in subs:
+                    config = config.replace("$%s" % match, repl)
             if section in default:
                 for key, value in default[section].items():
                     config.__dict__.setdefault(key, value)
-            else:
-                result.append((section, config))
+
+            result.append((section, config))
         return Config(dict(result))
 
     result = json.loads(json.dumps(data), object_pairs_hook=hook)
     for section, config in default.viewitems():
         result.__dict__.setdefault(section, Config(config))
+
+    # os.chdir(dirname)
     return result

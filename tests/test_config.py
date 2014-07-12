@@ -17,10 +17,12 @@ class TestConfig(unittest.TestCase):
 
     def test_default(self):
         config = pgv.config.parse(self.yaml_file)
-        self.assertTrue(config.logging.filename == "build/pgv.log")
-        self.assertTrue(config.logging.level == "INFO")
-        self.assertTrue(config.logging.bytes == 1000000)
-        self.assertTrue(config.logging.count == 4)
+        self.assertEquals(
+            config.logging.filename,
+            os.path.join(os.getcwd(), "build", "pgv.log"))
+        self.assertEquals(config.logging.level, "INFO")
+        self.assertEquals(config.logging.bytes, 1000000)
+        self.assertEquals(config.logging.count, 4)
 
     def tearDown(self):
         os.chdir(os.path.join(self.pwd, ".."))

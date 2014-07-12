@@ -5,3 +5,5 @@ test:
     - "3"
   key2: string
   key3: 123
+database:
+  isolation_level: autocommit

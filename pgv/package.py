@@ -43,12 +43,12 @@ class Package:
     schemas_dir = "schemas"
     scripts_dir = "scripts"
     events = {
-        "start",
-        "pre",
-        "success",
-        "error",
-        "post",
-        "stop"
+        "start":    "start",
+        "pre":      "pre",
+        "success":  "success",
+        "error":    "error",
+        "post":     "post",
+        "stop":     "stop"
     }
 
     def __init__(self, format):
@@ -72,7 +72,7 @@ class Package:
 
     def _check(self):
         def check_scripts_filter(filename):
-            for event in self.events:
+            for event in self.events.values():
                 if self._filter_event(filename, event):
                     return True
             return False
@@ -103,7 +103,7 @@ class Package:
         return basename.endswith("_" + event)
 
     def scripts(self, revision, event):
-        if event not in self.events:
+        if event not in self.events.values():
             raise Exception("Unknown event: %s" % event)
         directory = os.path.join(self.tmpdir, revision, self.scripts_dir)
         if not os.path.isdir(directory):

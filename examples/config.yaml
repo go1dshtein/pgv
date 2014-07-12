@@ -8,9 +8,9 @@ database:
   isolation_level: autocommit
 package:
   format: directory
-  path: dist/pgv
+  path: $PWD/dist/pgv
 logging:
   level: DEBUG
-  filename: build/pgv.log
+  filename: $PWD/build/pgv.log
   bytes: 1000000
   count: 2
