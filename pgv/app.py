@@ -1,5 +1,4 @@
 import os
-import sys
 import logging
 import pgv.utils
 
@@ -11,15 +10,15 @@ class Application:
         self.config = config
         self.options = options
 
-    def init(self):
+    def do_init(self):
         import pgv.installer
         initializer = pgv.installer.Initializer(
             pgv.utils.get_connection_string(self.options))
         initializer.initialize(options.overwrite)
 
-    def make(self):
+    def do_make(self):
         import pgv.builder
-        builder = pgv.builder.Builder(config)
+        builder = pgv.builder.Builder(self.config)
         package = builder.make(from_rev=self.options.from_rev,
                                to_rev=self.options.to_rev,
                                format=self.options.format)
@@ -28,7 +27,7 @@ class Application:
             path = self.config.package.path
         package.save(path)
 
-    def install(self):
+    def do_install(self):
         import pgv.installer
         import pgv.package
         installer = pgv.installer.Installer(
@@ -42,12 +41,12 @@ class Application:
         package.load(path)
         installer.install(package)
 
-    def skip(self):
+    def do_skip(self):
         import pgv.skiplist
         skiplist = pgv.skiplist.SkipList(self.config)
         skiplist.add(self.options.revision, self.options.filename)
 
-    def show(self):
+    def do_show(self):
         import pgv.viewer
         viewer = pgv.viewer.Viewer(self.config)
         if self.options.skipped:
@@ -58,12 +57,7 @@ class Application:
                         to_rev=self.options.to_rev)
 
     def run(self, command):
-        logger.debug("begin")
-        logger.debug("arguments: %s", " ".join(sys.argv))
-        try:
-            getattr(self, command)()
-        except AttributeError, e:
-            logger.error("Unknown command: %s", command)
-            raise
-        finally:
-            logger.debug("end\n\n")
+        action = "do_%s" % command
+        if action not in dir(self):
+            raise AttributeError("Unknown command: %s", command)
+        getattr(self, action)()

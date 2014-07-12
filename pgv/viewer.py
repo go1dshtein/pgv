@@ -13,8 +13,8 @@ class Viewer:
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
     def show(self, with_skipped, from_rev=None, to_rev=None):
-        skiplist = self.skiplist.load(to_rev)
         revlist = list(self.vcs.revisions(begin=from_rev, end=to_rev))
+        skiplist = self.skiplist.load(to_rev)
         for revision in revlist:
             skipfiles = set([])
             if revision.hash() in skiplist:

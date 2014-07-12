@@ -43,6 +43,7 @@ class SkipList:
             h.write(data)
 
     def add(self, revision, patterns=None):
+        revision = self.vcs.parse(revision)
         skiplist = self.load_local()
         if patterns is None:
             skiplist[revision] = None
@@ -62,7 +63,7 @@ class SkipList:
         logger.debug("loading skiplist from repo: %s", rev)
         tmpdir = tempfile.mkdtemp()
         try:
-            self.vcs.export(tmpdir, treeish=rev,
+            self.vcs.export(tmpdir, treeish=self.vcs.parse(rev),
                             files=(self.name,))
             filename = os.path.join(tmpdir, self.name)
             return self._read(filename)
