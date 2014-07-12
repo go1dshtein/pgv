@@ -7,6 +7,7 @@ import tarfile
 import logging
 import fnmatch
 from git import *
+import git.repo.fun
 
 import pgv.skiplist
 
@@ -21,11 +22,15 @@ class Git:
         tmpdir = kwargs.get("tmpdir", None)
         self.repodir = tempfile.mkdtemp(prefix='git', dir=tmpdir)
         logger.debug("cloning repo '%s' to %s", url, self.repodir)
-        self.repo = Repo.clone_from(url, self.repodir)
+        self.repo = Repo.clone_from(url, self.repodir, mirror=True)
         self.include = kwargs.get("include", None)
 
-    def revisions(self, begin=None, end="HEAD",
-                  branch='master', revision=None):
+    def parse(self, revision):
+        if revision is None:
+            return None
+        return self.repo.rev_parse(revision).hexsha
+
+    def revisions(self, begin=None, end="HEAD", revision=None):
         this = self
 
         class GitChange:
@@ -87,7 +92,9 @@ class Git:
             def skiplist_only(self):
                 return self._skiplist_only
 
-        revisions = branch
+        revisions = "HEAD"
+        begin = self.parse(begin)
+        end = self.parse(end)
         if begin is not None:
             if end is None:
                 end = "HEAD"
