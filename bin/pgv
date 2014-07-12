@@ -3,14 +3,14 @@ import os
 import sys
 import logging
 import pgv.config
+import pgv.options
 import pgv.utils
-import pgv.argparser
 import pgv.app
 
 
 def main():
     try:
-        options = pgv.argparser.parse()
+        options = pgv.options.parse()
         config = pgv.config.parse(pgv.utils.search_config(options.config))
         pgv.utils.setup_logging(config.logging)
         logger = logging.getLogger(__name__)

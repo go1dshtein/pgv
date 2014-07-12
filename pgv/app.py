@@ -11,8 +11,8 @@ class Application:
         self.options = options
 
     def do_init(self):
-        import pgv.installer
-        initializer = pgv.installer.Initializer(
+        import pgv.initializer
+        initializer = pgv.initializer.Initializer(
             pgv.utils.get_connection_string(self.options))
         initializer.initialize(options.overwrite)
 
