@@ -63,7 +63,7 @@ class Application:
         try:
             getattr(self, command)()
         except AttributeError, e:
-            logging.error("Unknown command: %s", command)
+            logger.error("Unknown command: %s", command)
             raise
         finally:
             logger.debug("end\n\n")
