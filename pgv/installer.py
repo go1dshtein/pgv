@@ -112,5 +112,3 @@ class Installer:
                     self.connection.commit()
                 self._meta_commit(revision)
                 logger.info("done\n")
-
-

@@ -86,7 +86,12 @@ $$
 language plpgsql;
 
 create or replace function pgv.revision()
-return character(127) as $$
-  return query select revision from pgv.revisions order by revisions_id desc limit 1;
+returns character(127) as $$
+  declare
+    o_revision character(127);
+  begin
+    select revision into o_revision from pgv.revisions order by revisions_id desc limit 1;
+    return o_revision;
+  end;
 $$
 language plpgsql;

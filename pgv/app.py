@@ -14,7 +14,7 @@ class Application:
         import pgv.initializer
         initializer = pgv.initializer.Initializer(
             pgv.utils.get_connection_string(self.options))
-        initializer.initialize(options.overwrite)
+        initializer.initialize(self.options.overwrite)
 
     def do_make(self):
         import pgv.builder

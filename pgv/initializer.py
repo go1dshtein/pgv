@@ -1,6 +1,9 @@
 import os
 import psycopg2
 import pgv.installer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Initializer:
