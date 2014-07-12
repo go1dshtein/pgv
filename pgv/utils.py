@@ -53,50 +53,6 @@ def get_isolation_level(isolation_level):
         raise Exception("Unknown isolation_level: %s", isolation_level)
 
 
-def execute(config, args):
-    if args.command == "init":
-        import pgv.installer
-        initializer = pgv.installer.Initializer(get_connection_string(args))
-        initializer.initialize(args.overwrite)
-    elif args.command == "make":
-        import pgv.builder
-        builder = pgv.builder.Builder(config)
-        package = builder.make(from_rev=args.from_rev,
-                               to_rev=args.to_rev,
-                               format=args.format)
-        path = args.output
-        if path is None:
-            path = config.package.path
-        package.save(path)
-    elif args.command == "install":
-        import pgv.installer
-        import pgv.package
-        installer = pgv.installer.Installer(
-            get_connection_string(args),
-            get_isolation_level(config.database.isolation_level))
-        package = pgv.package.Package(config.package.format)
-        path = args.input
-        if path is None:
-            path = config.package.path
-        package.load(path)
-        installer.install(package)
-    elif args.command == "skip":
-        import pgv.skiplist
-        skiplist = pgv.skiplist.SkipList(config)
-        skiplist.add(args.revision, args.filename)
-    elif args.command == "show":
-        import pgv.viewer
-        viewer = pgv.viewer.Viewer(config)
-        if args.skipped:
-            viewer.show_skipped(args.to_rev)
-        else:
-            viewer.show(args.with_skipped,
-                        from_rev=args.from_rev,
-                        to_rev=args.to_rev)
-    else:
-        raise Exception("Unknown command: %s" % args.command)
-
-
 def search_config(filename=None):
     if filename is not None:
         return filename

@@ -6,6 +6,7 @@ import yaml
 
 def parse(filename):
     dirname = os.path.dirname(filename) if filename else os.getcwd()
+    filename = os.path.realpath(filename) if filename else filename
     os.chdir(dirname)
 
     default = {
@@ -44,8 +45,8 @@ def parse(filename):
         result = []
         for section, config in pairs:
             if section in default:
-                for key, value in default[section]:
-                    config.__dict__.setdefault(key, dvalue)
+                for key, value in default[section].items():
+                    config.__dict__.setdefault(key, value)
             else:
                 result.append((section, config))
         return Config(dict(result))
