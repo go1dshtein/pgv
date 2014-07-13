@@ -37,9 +37,12 @@ class Parser:
         g.add_argument('-f', '--from', dest="from_rev", metavar="REVISION")
         g.add_argument('-t', '--to', dest="to_rev", metavar="REVISION")
 
-    def add_package(self, parser):
+    def add_package(self, parser, isoutput):
         g = parser.add_argument_group(title="optional package arguments")
-        g.add_argument('-o', '--output', metavar="PATH")
+        if isoutput:
+            g.add_argument('-o', '--output', metavar="PATH")
+        else:
+            g.add_argument('-i', '--input', metavar="PATH")
         g.add_argument('-F', '--format',
                        choices=("tar", "tar.gz", "tar.bz2", "directory"))
 
@@ -69,7 +72,7 @@ class Parser:
                                         help="make package",
                                         usage=usage)
         make.add_argument('--help', action="help")
-        self.add_package(make)
+        self.add_package(make, True)
         self.add_version(make)
         self.add_connection(make)
 
@@ -86,7 +89,7 @@ class Parser:
         install.add_argument('--help', action="help")
         install.add_argument('--devel', action="store_true",
                              help="install schema from working directory")
-        self.add_package(install)
+        self.add_package(install, False)
         self.add_connection(install, True)
 
     def add_skip(self):

@@ -52,13 +52,15 @@ class Installer:
             return result is not None
 
     def _run_scripts(self, package, revision, event):
+        dirname = os.path.join(package.tmpdir, revision)
         with self.connection.cursor() as cursor:
             for filename in package.scripts(revision, event):
                 script = self._get_text(filename)
-                script_id = self._meta_run(filename)
+                script_id = self._meta_run(filename[len(dirname):].lstrip("/"))
                 try:
                     logger.debug("run script `%s' on event '%s': \n%s",
                                  filename, event, script)
+                    logger.info("  > %s", filename[len(dirname):].lstrip("/"))
                     cursor.execute(script)
                     logger.debug("status: \n%s", cursor.statusmessage)
                 except Exception, e:
@@ -68,16 +70,20 @@ class Installer:
                     self._meta_success(script_id)
 
     def _run_schemas(self, package, revision):
+        dirname = os.path.join(package.tmpdir, revision)
         with self.connection.cursor() as cursor:
-            for schema in package.schemas(revision):
-                logger.info("  installing schema %s", schema)
+            for schema in sorted(package.schemas(revision)):
+                logger.info("  changing schema %s", schema)
                 try:
                     self._run_scripts(package, revision, self.events.pre)
-                    for filename in package.schema_files(revision, schema):
+                    for filename in sorted(
+                            package.schema_files(revision, schema)):
                         try:
                             script = self._get_text(filename)
                             logger.debug("run schema script `%s': \n%s",
                                          filename, script)
+                            logger.info(
+                                "    %s", filename[len(dirname):].lstrip("/"))
                             cursor.execute(script)
                             logger.debug("status: \n%s", cursor.statusmessage)
                         except:

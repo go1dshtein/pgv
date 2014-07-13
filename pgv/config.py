@@ -11,6 +11,10 @@ def parse(filename):
     dirname = os.path.dirname(filename) if filename else os.getcwd()
 
     default = {
+        "config": {
+            "filename": filename,
+            "dirname": dirname
+        },
         "logging": {
             "level": "INFO",
             "bytes": 1000000,

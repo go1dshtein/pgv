@@ -25,6 +25,7 @@ class Viewer:
                     else:
                         continue
                 else:
+                    print revision.hash()
                     skipfiles = set(skiplist[revision.hash()])
             else:
                 print revision.hash(), "[s]" if \

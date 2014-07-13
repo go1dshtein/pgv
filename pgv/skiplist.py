@@ -14,6 +14,7 @@ class SkipList:
     name = ".skiplist"
 
     def __init__(self, config, vcs=None):
+        self.config = config
         if vcs:
             self.vcs = vcs
         else:
@@ -37,7 +38,8 @@ class SkipList:
             return dict()
 
     def _save_local(self, data):
-        filename = os.path.join(self.prefix, self.name)
+        filename = os.path.join(self.config.config.dirname,
+                                self.prefix, self.name)
         data = yaml.dump(data, default_flow_style=False)
         with open(filename, "w") as h:
             h.write(data)
@@ -48,13 +50,13 @@ class SkipList:
         if patterns is None:
             skiplist[revision] = None
         else:
-            allfiles = self.vcs.revision(revision).files()
+            allfiles = list(self.vcs.revision(revision).files())
             result = set([])
             for pattern in patterns:
                 files = fnmatch.filter(allfiles, pattern)
                 result |= set(files)
             logger.debug("adding to skiplist: %s", result)
-            result |= set(skiplist.get(revision, []))
+            result |= set(skiplist.get(revision, []) or [])
             if result:
                 skiplist[revision] = list(result)
         self._save_local(skiplist)
@@ -72,6 +74,7 @@ class SkipList:
                 shutil.rmtree(tmpdir)
 
     def load_local(self):
-        filename = os.path.join(self.prefix, self.name)
+        filename = os.path.join(self.config.config.dirname,
+                                self.prefix, self.name)
         logger.debug("loading local skiplist: %s", filename)
         return self._read(filename)
