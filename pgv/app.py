@@ -12,9 +12,12 @@ class Application:
 
     def do_init(self):
         import pgv.initializer
-        initializer = pgv.initializer.Initializer(
-            pgv.utils.get_connection_string(self.options))
-        initializer.initialize(self.options.overwrite)
+        if self.options.repo_only or self.options.dbname is None:
+            connection = None
+        else:
+            connection = pgv.utils.get_connection_string(self.options)
+        initializer = pgv.initializer.Initializer(connection)
+        initializer.initialize(self.options.prefix, self.options.overwrite)
 
     def do_make(self):
         import pgv.builder

@@ -54,10 +54,15 @@ class Parser:
 
         init = self.commands.add_parser(
             'init', add_help=False, usage=usage,
-            help="init versioning schema in database")
+            help="init ")
         init.add_argument('--help', action="help")
         init.add_argument('-o', '--overwrite', action="store_true",
-                          help="overwrite if schema exists")
+                          help="overwrite if schema exists in database")
+        init.add_argument('-P', '--prefix', metavar="PATH",
+                          help="schemas directory prefix",
+                          default="")
+        init.add_argument('-R', '--repo-only', action="store_true",
+                          help="initialize repository only")
         self.add_connection(init)
 
     def add_make(self):
