@@ -11,8 +11,8 @@ class Parser:
                                  help="main configuration file")
         self.commands = self.parser.add_subparsers(dest="command")
         self.add_init()
-        self.add_make()
-        self.add_install()
+        self.add_collect()
+        self.add_push()
         self.add_skip()
         self.add_show()
 
@@ -65,37 +65,37 @@ class Parser:
                           help="initialize repository only")
         self.add_connection(init)
 
-    def add_make(self):
+    def add_collect(self):
         usage = """
-    pgv make [--help]
-    pgv make [-f REVISION] [-t REVISION] [-o PATH] [-F FORMAT]
-    pgv make -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W] \
+    pgv collect [--help]
+    pgv collect [-f REVISION] [-t REVISION] [-o PATH] [-F FORMAT]
+    pgv collect -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W] \
 [-t REVISION] [-o PATH] [-F FORMAT]
         """
 
-        make = self.commands.add_parser('make', add_help=False,
-                                        help="make package",
-                                        usage=usage)
-        make.add_argument('--help', action="help")
-        self.add_package(make, True)
-        self.add_version(make)
-        self.add_connection(make)
+        collect = self.commands.add_parser('collect', add_help=False,
+                                           help="collect changes into package",
+                                           usage=usage)
+        collect.add_argument('--help', action="help")
+        self.add_package(collect, True)
+        self.add_version(collect)
+        self.add_connection(collect)
 
-    def add_install(self):
+    def add_push(self):
         usage = """
-    pgv install [--help]
-    pgv install [--devel] -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W] \
+    pgv push [--help]
+    pgv push [-c] -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W] \
 [-i PATH] [ -F FORMAT]
         """
 
-        install = self.commands.add_parser('install', add_help=False,
-                                           help="install package to database",
-                                           usage=usage)
-        install.add_argument('--help', action="help")
-        install.add_argument('--devel', action="store_true",
-                             help="install schema from working directory")
-        self.add_package(install, False)
-        self.add_connection(install, True)
+        push = self.commands.add_parser('push', add_help=False,
+                                        help="push changes to database",
+                                        usage=usage)
+        push.add_argument('--help', action="help")
+        push.add_argument('-c', '--collect', help="alias to collect && push",
+                          action="store_true")
+        self.add_package(push, False)
+        self.add_connection(push, True)
 
     def add_skip(self):
         usage = """

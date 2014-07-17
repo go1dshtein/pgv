@@ -1,5 +1,5 @@
 vcs:
-  prefix: test/data/sql
+  prefix: tests/data/sql
   include:
     - "schemes/*/types/*.sql"
 package:

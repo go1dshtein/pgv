@@ -19,7 +19,7 @@ class Application:
         initializer = pgv.initializer.Initializer(connection)
         initializer.initialize(self.options.prefix, self.options.overwrite)
 
-    def do_make(self):
+    def do_collect(self):
         import pgv.builder
         builder = pgv.builder.Builder(self.config)
         package = builder.make(from_rev=self.options.from_rev,
@@ -30,17 +30,26 @@ class Application:
             path = self.config.package.path
         package.save(path)
 
-    def do_install(self):
+    def do_push(self):
         import pgv.installer
         import pgv.package
+
+        if self.options.collect:
+            import pgv.builder
+            builder = pgv.builder.Builder(self.config)
+            package = builder.make(format=self.options.format)
+        else:
+            package = pgv.package.Package(self.config.package.format)
+
         installer = pgv.installer.Installer(
             pgv.utils.get_connection_string(self.options),
             pgv.utils.get_isolation_level(
                 self.config.database.isolation_level))
-        package = pgv.package.Package(self.config.package.format)
         path = self.options.input
         if path is None:
             path = self.config.package.path
+        if self.options.collect:
+            package.save(path)
         package.load(path)
         installer.install(package)
 
