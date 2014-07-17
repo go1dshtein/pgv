@@ -2,33 +2,104 @@
 .SH NAME
 pgv \- PostgreSQL schema versioning tool
 .SH SYNOPSYS
-.B pgv [--help] [-c
+.B pgv
+[--help] [-c
 .I CONFIG
 ]
 .I COMMAND
 .SH DESCRIPTION
-
+.B pgv
+is schema versioning tool for PostgreSQL.
+.P
+It helps to support database schemas in VCS repository and push changes into
+database as needed - revision by revision.
+Revision is native revision of your VCS, so no mappings are needed.
+.P
+All information about files which you need to apply to database should be stored in specific
+directory structure. See
+.BR "CODE STRUCTURE"
+below for further details.
+.P
+Information of applied changes will be stored to schema
+.I pgv
+of target database.
 .SH COMMANDS
-.IP init
-initializes repository for pgv in the current directory and/or database
-.IP make
-creates package with tracking revisions
-.IP install
-install package to database - apply changes in schemas
-.IP skip
-excludes specified revisions(whole or few files) from packaging
-.IP show
-shows information about tracking revisions in repository and  database.
+.TP
+.B init
+initializes repository in the current directory
+and/or creates schema
+.I pgv
+in database;
+.TP
+.B collect
+collects changes into dictribution package;
+.TP
+.B push
+pushes changes to database;
+.TP
+.B skip
+marks specified revisions(whole or some files) for skip in collecting;
+.TP
+.B show
+shows information about revisions in repository and database.
 .SH OPTIONS
 .IP --help
-print help and exit
+print help and exit;
 .IP "-c CONFIG"
 use
 .I CONFIG
 instead of VCS repository wide
 .IR .pgv
-configuration file
+configuration file.
 .SH CODE STRUCTURE
+.B pgv
+divide all sql file into two folders - schemas and scripts.
+Schemas folder containes subfolders named after desired schemas, e.g.: public.
+It contains sql files which defines schema - tables, views, types, functions etc.
+.P
+Scripts folder contains staff sql procedures like creating users, grants, data fixes etc.
+It has specific names, like <name>_<event>.sql.
+Event defines the place in flow when script should be applied:
+.TP
+.B start
+before all other, once per revision;
+.TP
+.B stop
+after all other, once per revision;
+.TP
+.B pre
+before applying schema, once per schema;
+.TP
+.B post
+after applying schema, once per schema;
+.TP
+.B success
+after successfully finished schema script;
+.TP
+.B error
+after unsuccessfully finished schema script.
+.P
+If scripts does not ends with
+.I _<event>
+then it will never be applied. But it can be included to another script using
+.I \\\i
+or
+.I \\\ir
+directive.
+.P
+Scripts can contains placeholders like
+.I %(variable)s
+for variables.
+Supported variables are:
+.TP
+.B revision
+currently applying revision;
+.TP
+.B schema
+currently applying schema, if available;
+.TP
+.B filename
+currently applying schema filename, if available;
 .SH FILES
 By default
 .B pgv
@@ -48,4 +119,3 @@ Kirill Goldshtein <kirill.goldshtein at gmail.com>
 .BR pgv-install (1)
 .BR pgv-skip (1)
 .BR pgv-show (1)
-
