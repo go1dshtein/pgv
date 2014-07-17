@@ -1,0 +1,51 @@
+.TH PGV 1 "JULY 2014"
+.SH NAME
+pgv \- PostgreSQL schema versioning tool
+.SH SYNOPSYS
+.B pgv [--help] [-c
+.I CONFIG
+]
+.I COMMAND
+.SH DESCRIPTION
+
+.SH COMMANDS
+.IP init
+initializes repository for pgv in the current directory and/or database
+.IP make
+creates package with tracking revisions
+.IP install
+install package to database - apply changes in schemas
+.IP skip
+excludes specified revisions(whole or few files) from packaging
+.IP show
+shows information about tracking revisions in repository and  database.
+.SH OPTIONS
+.IP --help
+print help and exit
+.IP "-c CONFIG"
+use
+.I CONFIG
+instead of VCS repository wide
+.IR .pgv
+configuration file
+.SH CODE STRUCTURE
+.SH FILES
+By default
+.B pgv
+searches for
+.IR .pgv
+configuration file in current and parent directories recursively.
+This file describes location of directory with SQL files,
+type of generated package, permanently included files and logging.
+More info about configuration file see in
+.BR pgv-config (5)
+.SH AUTHOR
+Kirill Goldshtein <kirill.goldshtein at gmail.com>
+.SH SEE ALSO
+.BR pgv-config (5)
+.BR pgv-init (1)
+.BR pgv-make (1)
+.BR pgv-install (1)
+.BR pgv-skip (1)
+.BR pgv-show (1)
+
