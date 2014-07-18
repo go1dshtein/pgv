@@ -55,7 +55,7 @@ class Parser:
         init = self.commands.add_parser(
             'init', add_help=False, usage=usage,
             help="init ")
-        init.add_argument('--help', action="help")
+        init.add_argument('--help', action="help", help="print help and exit")
         init.add_argument('-o', '--overwrite', action="store_true",
                           help="overwrite if schema exists in database")
         init.add_argument('-P', '--prefix', metavar="PATH",

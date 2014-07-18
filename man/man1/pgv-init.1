@@ -1,0 +1,67 @@
+.TH PGV-INIT "JULY 2014"
+.SH NAME
+pgv init - initializes repository in the current directory
+and/or creates schema
+.I pgv
+in database.
+.SH SYNOPSYS
+.B "pgv init"
+[--help]
+.P
+.B "pgv init"
+[ -o] [-d
+.I DBNAME
+] [-h
+.I HOST
+] [-p
+.I PORT
+] [-U
+.I USERNAME
+] [-w|-W]
+.P
+.B "pgv init"
+[-P
+.I PATH
+] [-R]
+.SH DESCRIPTION
+.B "pgv init"
+prepare working directory and database.
+It creates schemas directory with right structure and
+minimal configuration file in the current directory.
+.P
+Also it is needed to initialize versioning in a database.
+.B "pgv init"
+creates schema in database for tracking changes.
+.SH OPTIONS
+.IP --help
+print help and exit;
+.IP "-o --overwrite"
+overwrite schema if it already exists in database;
+.IP "-P PATH --prefix PATH"
+schemas directory relatively current directory;
+.IP "-R --repo-only"
+initialize only VCS repository;
+.IP "-d DBNAME --dbname DBNAME"
+name of target database;
+.IP "-h HOST --host HOST"
+database server address;
+.IP "-p PORT --port PORT"
+database port;
+.IP "-U USERNAME --username USERNAME"
+database username;
+.IP "-w --no-password"
+no ask for password;
+.IP "-W --password"
+ask for password.
+.SH EXAMPLES
+For example, you start new project and want store database schema in ./database/sql folder, so
+.RS
+pgv init -P database/sql
+.RE
+.PP
+Before pushing changes to database, you should initialize it:
+.RS
+pgv init -d mydb -h test -U test
+.RE
+.SH SEE ALSO
+.BR pgv (1)
