@@ -51,6 +51,11 @@ class Installer:
             result = cursor.fetchone()[0]
             return result is not None
 
+    def _meta_revision(self):
+        with self.metaconn.cursor() as cursor:
+            cursor.callproc("%s.revision" % self.schema)
+            return cursor.fetchone()[0]
+
     def _run_scripts(self, package, revision, event):
         dirname = os.path.join(package.tmpdir, revision)
         with self.connection.cursor() as cursor:
@@ -118,3 +123,6 @@ class Installer:
                     self.connection.commit()
                 self._meta_commit(revision)
                 logger.info("done\n")
+
+    def get_revision(self):
+        return self._meta_revision()

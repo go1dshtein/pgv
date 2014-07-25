@@ -4,14 +4,14 @@ create schema pgv;
 
 create table if not exists pgv.revisions(
   revisions_id bigserial primary key,
-  revision character(127) unique not null,
+  revision character varying(127) unique not null,
   time timestamp not null default current_timestamp
 );
 
 create table if not exists pgv.versions(
   versions_id bigserial primary key,
   revisions_id bigint not null unique references pgv.revisions,
-  version character(127) unique not null
+  version character varying(127) unique not null
 );
 
 create table if not exists pgv.scripts(
@@ -73,7 +73,7 @@ $$
 language plpgsql
 strict;
 
-create or replace function pgv.commit(p_revision character(127))
+create or replace function pgv.commit(p_revision character varying(127))
 returns bigint as $$
   declare
     o_revisions_id bigint;
@@ -86,12 +86,13 @@ $$
 language plpgsql;
 
 create or replace function pgv.revision()
-returns character(127) as $$
+returns character varying(127) as $$
   declare
-    o_revision character(127);
+    o_revision character varying(127);
   begin
     select revision into o_revision from pgv.revisions order by revisions_id desc limit 1;
     return o_revision;
   end;
 $$
-language plpgsql;
+language plpgsql
+security definer;

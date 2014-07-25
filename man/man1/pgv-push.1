@@ -1,0 +1,62 @@
+.TH PGV-PUSH "JULY 2014"
+.SH NAME
+pgv push - applies changes to target database.
+.SH SYNOPSYS
+.B "pgv push"
+[--help]
+.P
+.B "pgv push"
+[ -c] -d
+.I DBNAME
+[-h
+.I HOST
+] [-p
+.I PORT
+] [-U
+.I USERNAME
+] [-w|-W] [-i
+.I PATH
+] [-F
+.I FORMAT
+]
+.SH DESCRIPTION
+.B "pgv push"
+reads package with changes and executes SQL scripts from it on database.
+.SH OPTIONS
+.IP --help
+print help and exit;
+.IP "-c --collect"
+collect changes to package, alias to
+.B "pgv collect && pgv push"
+;
+.IP "-d DBNAME --dbname DBNAME"
+name of target database;
+.IP "-h HOST --host HOST"
+database server address;
+.IP "-p PORT --port PORT"
+database port;
+.IP "-U USERNAME --username USERNAME"
+database username;
+.IP "-w --no-password"
+no ask for password;
+.IP "-W --password"
+ask for password;
+.IP "-i PATH --input PATH"
+path to package;
+.IP "-F FORMAT --format FORMAT"
+format of package.
+.SH EXAMPLES
+For example, you have collected package and want to push it to database
+.I example,
+so
+.RS
+pgv push -d example
+.RE
+.PP
+If you want to push changes from another package:
+.RS
+pgv push -d example -i path/to/package.tar.gz
+.RE
+.SH SEE ALSO
+.BR pgv (1)
+

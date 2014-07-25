@@ -55,7 +55,7 @@ class Parser:
 
         initdb = self.commands.add_parser(
             'initdb', add_help=False, usage=usage,
-            help="init ")
+            help="initializes new database for working pgv")
         initdb.add_argument('--help', action="help",
                             help="print help and exit")
         initdb.add_argument('-o', '--overwrite', action="store_true",
@@ -69,7 +69,7 @@ class Parser:
         """
         init = self.commands.add_parser(
             'init', add_help=False, usage=usage,
-            help="init ")
+            help="initializes repository in the current directory")
         init.add_argument('--help', action="help",
                           help="print help and exit")
         init.add_argument('-p', '--prefix', metavar="PATH",
@@ -96,13 +96,14 @@ class Parser:
         usage = """
     pgv push [--help]
     pgv push [-c] -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W] \
-[-i PATH] [ -F FORMAT]
+[-i PATH] [-F FORMAT]
         """
 
         push = self.commands.add_parser('push', add_help=False,
-                                        help="push changes to database",
+                                        help="applies changes to target",
                                         usage=usage)
-        push.add_argument('--help', action="help")
+        push.add_argument('--help', action="help",
+                          help="print help and exit")
         push.add_argument('-c', '--collect', help="alias to collect && push",
                           action="store_true")
         self.add_package(push, False)
