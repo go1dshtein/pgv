@@ -10,14 +10,16 @@ class Application:
         self.config = config
         self.options = options
 
+    def do_initdb(self):
+        import pgv.initializer
+        connection = pgv.utils.get_connection_string(self.options)
+        initializer = pgv.initializer.Initializer(connection)
+        initializer.initialize_schema(self.options.overwrite)
+
     def do_init(self):
         import pgv.initializer
-        if self.options.repo_only or self.options.dbname is None:
-            connection = None
-        else:
-            connection = pgv.utils.get_connection_string(self.options)
-        initializer = pgv.initializer.Initializer(connection)
-        initializer.initialize(self.options.prefix, self.options.overwrite)
+        initializer = pgv.initializer.Initializer()
+        initializer.initialize_repo(self.options.prefix)
 
     def do_collect(self):
         import pgv.builder

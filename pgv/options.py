@@ -11,6 +11,7 @@ class Parser:
                                  help="main configuration file")
         self.commands = self.parser.add_subparsers(dest="command")
         self.add_init()
+        self.add_initdb()
         self.add_collect()
         self.add_push()
         self.add_skip()
@@ -46,24 +47,34 @@ class Parser:
         g.add_argument('-F', '--format',
                        choices=("tar", "tar.gz", "tar.bz2", "directory"))
 
+    def add_initdb(self):
+        usage = """
+    pgv initdb [--help]
+    pgv initdb [-o] -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W]
+        """
+
+        initdb = self.commands.add_parser(
+            'initdb', add_help=False, usage=usage,
+            help="init ")
+        initdb.add_argument('--help', action="help",
+                            help="print help and exit")
+        initdb.add_argument('-o', '--overwrite', action="store_true",
+                            help="overwrite if schema exists in database")
+        self.add_connection(initdb, required=True)
+
     def add_init(self):
         usage = """
     pgv init [--help]
-    pgv init [-o] [-d DBNAME] [-h HOST] [-p PORT] [-U USERNAME] [-w|-W]
+    pgv init [-p PATH]
         """
-
         init = self.commands.add_parser(
             'init', add_help=False, usage=usage,
             help="init ")
-        init.add_argument('--help', action="help", help="print help and exit")
-        init.add_argument('-o', '--overwrite', action="store_true",
-                          help="overwrite if schema exists in database")
-        init.add_argument('-P', '--prefix', metavar="PATH",
-                          help="schemas directory prefix",
+        init.add_argument('--help', action="help",
+                          help="print help and exit")
+        init.add_argument('-p', '--prefix', metavar="PATH",
+                          help="relative path to schemas directory",
                           default="")
-        init.add_argument('-R', '--repo-only', action="store_true",
-                          help="initialize repository only")
-        self.add_connection(init)
 
     def add_collect(self):
         usage = """

@@ -9,13 +9,13 @@ import pgv.app
 
 
 def main():
+    options = pgv.options.parse()
+    config = pgv.config.parse(pgv.utils.search_config(options.config))
+    pgv.utils.setup_logging(config.logging)
+    logger = logging.getLogger(__name__)
+    logger.debug("begin")
+    logger.debug("arguments: %s", " ".join(sys.argv))
     try:
-        options = pgv.options.parse()
-        config = pgv.config.parse(pgv.utils.search_config(options.config))
-        pgv.utils.setup_logging(config.logging)
-        logger = logging.getLogger(__name__)
-        logger.debug("begin")
-        logger.debug("arguments: %s", " ".join(sys.argv))
         pgv.app.Application(config, options).run(options.command)
     except Exception, e:
         logger.exception(e)

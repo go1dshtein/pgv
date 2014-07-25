@@ -18,8 +18,6 @@ class Initializer:
             self.repo_only = False
             logger.debug("connection string: %s", constring)
             self.connection = psycopg2.connect(constring)
-        else:
-            self.repo_only = True
 
     def is_installed(self):
         query = """
@@ -32,6 +30,14 @@ class Initializer:
         return count > 0
 
     def initialize_repo(self, prefix=""):
+        current = os.getcwd()
+        config = os.path.join(current, ".pgv")
+        if not os.path.exists(config):
+            config = pgv.utils.search_config()
+        if config:
+            logger.warning("repository is initialized already:")
+            logger.warning("  see: %s", config)
+            return
         logger.info("initializing repository")
         current = os.getcwd()
         config = os.path.join(current, ".pgv")
@@ -65,18 +71,3 @@ class Initializer:
             logger.debug(script)
             cursor.execute(script)
         self.connection.commit()
-
-    def initialize(self, prefix="", overwriting=False):
-        current = os.getcwd()
-        config = os.path.join(current, ".pgv")
-        if not os.path.exists(config):
-            config = pgv.utils.search_config()
-        if not config:
-            self.initialize_repo(prefix)
-        elif self.repo_only:
-            logger.warning("repository is initialized already:")
-            logger.warning("  see: %s", config)
-        else:
-            logger.debug("repository is initialized: %s", config)
-        if not self.repo_only:
-            self.initialize_schema(overwriting)
