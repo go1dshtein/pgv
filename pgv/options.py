@@ -119,7 +119,7 @@ class Parser:
         """
 
         skip = self.commands.add_parser('skip', add_help=False,
-                                        help="skip revision from package",
+                                        help="skip changes",
                                         usage=usage)
         skip.add_argument('--help', action="help")
         skip.add_argument('revision')
@@ -134,10 +134,12 @@ class Parser:
         """
 
         show = self.commands.add_parser('show', add_help=False,
-                                        help="show revisions", usage=usage)
+                                        help="shows revisions", usage=usage)
         show.add_argument('--help', action="help")
-        show.add_argument('-s', '--skipped', action="store_true")
-        show.add_argument('-w', '--with-skipped', action="store_true")
+        show.add_argument('-s', '--skipped', action="store_true",
+                          help="shows only skipped revisions")
+        show.add_argument('-w', '--with-skipped', action="store_true"
+                          help="shows skipped revisions")
         self.add_version(show)
 
 
