@@ -1,0 +1,88 @@
+.TH PGV-COLLECT 1 "JULY 2014"
+.SH NAME
+pgv collect - collect changes into package
+.SH SYNOPSYS
+.B "pgv collect"
+[--help]
+.P
+.B "pgv collect"
+[-f
+.I REVISION
+] [-t
+.I REVISION
+] [-o
+.I PATH
+] [-F
+.I FORMAT
+]
+.P
+.B "pgv collect"
+-d
+.I DBNAME
+[-h
+.I HOST
+] [-p
+.I PORT
+] [-U
+.I USERNAME
+] [-w|-W]
+[-t
+.I REVISION
+] [-o
+.I PATH
+] [-F
+.I FORMAT
+]
+.SH DESCRIPTION
+.B "pgv collect"
+collects changes to package which one can be pushed to database.
+.P
+If
+.I DBNAME
+is defined than
+.I pgv
+gets minimal revision (
+.I --from
+analogue) from database.
+.SH OPTIONS
+.IP --help
+print help and exit;
+.IP "-o PATH --output PATH"
+path to package;
+.IP "-F FORMAT --format FORMAT"
+format of package.
+.IP "-f REVISION --from REVISION"
+no collect changes older than revision;
+.IP "-t REVISION --to REVISION"
+no collect changes newer than revision;
+.IP "-d DBNAME --dbname DBNAME"
+name of target database;
+.IP "-h HOST --host HOST"
+database server address;
+.IP "-p PORT --port PORT"
+database port;
+.IP "-U USERNAME --username USERNAME"
+database username;
+.IP "-w --no-password"
+no ask for password;
+.IP "-W --password"
+ask for password.
+.SH EXAMPLES
+.PP
+If you want to collect changes into package on default path:
+.RS
+pgv collect
+.RE
+.PP
+If you want to collect only "unpushed" changes:
+.RS
+pgv collect -d mydb -h test -U test
+.RE
+.PP
+If you want to collect specific set of changes:
+.RS
+pgv collect -f <revisison> -t <revision>
+.RE
+.SH SEE ALSO
+.BR pgv (1)
+

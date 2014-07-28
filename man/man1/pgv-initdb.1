@@ -1,4 +1,4 @@
-.TH PGV-INITDB "JULY 2014"
+.TH PGV-INITDB 1 "JULY 2014"
 .SH NAME
 pgv initdb - initializes new database for working with
 .I pgv
@@ -42,9 +42,14 @@ no ask for password;
 ask for password.
 .SH EXAMPLES
 .PP
-Before pushing changes to database, you should initialize it:
+Before pushing changes to new database, you should initialize it:
 .RS
-pgv init -d mydb -h test -U test
+pgv initdb -d mydb -h test -U test
+.RE
+.PP
+If you want to enable versioning on existing database:
+.RS
+pgv initdb -r <revision> -d mydb -h test -U test
 .RE
 .SH SEE ALSO
 .BR pgv (1)
