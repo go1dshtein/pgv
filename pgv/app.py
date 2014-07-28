@@ -19,7 +19,12 @@ class Application:
     def do_initdb(self):
         connection = pgv.utils.get_connection_string(self.options)
         initializer = pgv.initializer.Initializer(connection)
-        initializer.initialize_schema(self.options.overwrite)
+        if self.options.revision:
+            builder = pgv.builder.Builder(self.config)
+            revisions = map(
+                lambda x: x[0].hash(),
+                builder.get_revisions(to_rev=self.options.revision))
+        initializer.initialize_schema(self.options.overwrite, revisions)
 
     def do_init(self):
         initializer = pgv.initializer.Initializer()

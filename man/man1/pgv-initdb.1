@@ -1,13 +1,15 @@
 .TH PGV-INITDB "JULY 2014"
 .SH NAME
-pgv initdb - initializes new database for working
+pgv initdb - initializes new database for working with
 .I pgv
 .SH SYNOPSYS
 .B "pgv initdb"
 [--help]
 .P
 .B "pgv initdb"
-[ -o] -d
+[ -o] [-r
+.I REVISION
+] -d
 .I DBNAME
 [-h
 .I HOST
@@ -17,7 +19,6 @@ pgv initdb - initializes new database for working
 .I USERNAME
 ] [-w|-W]
 .SH DESCRIPTION
-Also it is needed to initialize versioning in a database.
 .B "pgv init"
 creates schema in database for tracking changes.
 .SH OPTIONS
@@ -25,6 +26,8 @@ creates schema in database for tracking changes.
 print help and exit;
 .IP "-o --overwrite"
 overwrite schema if it already exists in database;
+.IP "-r REVISION --revision REVISION"
+mark that database is updated to revision;
 .IP "-d DBNAME --dbname DBNAME"
 name of target database;
 .IP "-h HOST --host HOST"

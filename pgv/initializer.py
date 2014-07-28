@@ -57,7 +57,7 @@ class Initializer:
         else:
             os.makedirs(scripts)
 
-    def initialize_schema(self, overwrite=False):
+    def initialize_schema(self, overwrite=False, revisions=None):
         if self.is_installed():
             logger.warning("%s schema is installed already", self.schema)
             if not overwrite:
@@ -70,4 +70,11 @@ class Initializer:
         with self.connection.cursor() as cursor:
             logger.debug(script)
             cursor.execute(script)
+
+            if revisions:
+                for revision in revisions:
+                    logger.warning("marking revision %s as installed",
+                                   revision)
+                    cursor.callproc("%s.commit" % self.schema, (revision,))
+
         self.connection.commit()

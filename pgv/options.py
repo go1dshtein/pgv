@@ -50,7 +50,8 @@ class Parser:
     def add_initdb(self):
         usage = """
     pgv initdb [--help]
-    pgv initdb [-o] -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W]
+    pgv initdb [-o] [-r REVISION] -d DBNAME [-h HOST] [-p PORT] \
+[-U USERNAME] [-w|-W]
         """
 
         initdb = self.commands.add_parser(
@@ -60,6 +61,8 @@ class Parser:
                             help="print help and exit")
         initdb.add_argument('-o', '--overwrite', action="store_true",
                             help="overwrite if schema exists in database")
+        initdb.add_argument('-r', '--revision',
+                            help="mark that database is updated to revision")
         self.add_connection(initdb, required=True)
 
     def add_init(self):

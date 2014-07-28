@@ -17,10 +17,7 @@ class Builder:
                                include=config.vcs.include)
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
-    def make(self, from_rev=None, to_rev=None, format=None):
-        if format is None:
-            format = self.config.package.format
-        package = pgv.package.Package(format)
+    def get_revisions(self, from_rev=None, to_rev=None):
         skiplist = self.skiplist.load(to_rev)
         revlist = list(self.vcs.revisions(begin=from_rev, end=to_rev))
         for revision in reversed(revlist):
@@ -31,6 +28,14 @@ class Builder:
                     continue
                 else:
                     skipfiles = skiplist[revision.hash()]
+            yield revision, skipfiles
+
+    def make(self, from_rev=None, to_rev=None, format=None):
+        if format is None:
+            format = self.config.package.format
+        package = pgv.package.Package(format)
+        for revision, skipfiles in self.get_revisions(from_rev=from_rev,
+                                                      to_rev=to_rev):
             logger.info("collect revision: %s", revision.hash())
             package.add(revision, skipfiles)
         return package
