@@ -1,6 +1,6 @@
-% pgv-initdb(1)
+%pgv-initdb(1)
 %
-% July, 2014
+%July, 2014
 
 #NAME
 pgv initdb - initializes new database for working with *pgv*.

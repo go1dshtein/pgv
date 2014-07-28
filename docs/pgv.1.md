@@ -1,4 +1,4 @@
-%pgv (1)
+%pgv(1)
 %
 %July, 2014
 
@@ -16,7 +16,7 @@ database as needed - revision by revision.
 Revision is native revision of your VCS, so no mappings are needed.
 
 All information about files which you need to apply to database should be stored in specific
-directory structure. See [](CODE STRUCTURE) below for further details.
+directory structure. See [CODE STRUCTURE](#CODE STRUCTURE) below for further details.
 
 Information of applied changes will be stored to schema *pgv* of target database.
 

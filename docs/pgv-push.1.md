@@ -1,6 +1,6 @@
-%pgv-init (1)
+%pgv-init(1)
 %
-% July, 2014
+%July, 2014
 
 #NAME
 pgv push - applies changes to target database.

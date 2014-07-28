@@ -1,8 +1,6 @@
-<!---
-% pgv-collect(1)
+%pgv-collect(1)
 %
-% July, 2014
--->
+%July, 2014
 
 #NAME
 pgv collect - collect changes into package.
