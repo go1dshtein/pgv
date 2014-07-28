@@ -1,6 +1,8 @@
+<!---
 %pgv-init(1)
 %
 %July, 2014
+-->
 
 #NAME
 pgv init - initializes repository in the current directory.
@@ -27,5 +29,7 @@ You start new project and want to store database schema in "./database/sql" fold
 
 	pgv init -p database/sql
 
+<!---
 #SEE ALSO
 `pgv(1)`
+-->

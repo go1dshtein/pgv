@@ -1,6 +1,8 @@
+<!---
 %pgv-init(1)
 %
 %July, 2014
+-->
 
 #NAME
 pgv push - applies changes to target database.
@@ -54,6 +56,7 @@ If you want to push changes from another package:
 
 	pgv push -d test -i path/to/package.tar.gz
 
+<!---
 #SEE ALSO
 `pgv (1)`
-
+-->

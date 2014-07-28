@@ -1,6 +1,8 @@
+<!---
 %pgv-collect(1)
 %
 %July, 2014
+-->
 
 #NAME
 pgv collect - collect changes into package.
@@ -65,6 +67,7 @@ You can skip psuhed changes:
 And you can specify set of changes to collect:
 
 	pgv collect -f <revision> -t <revision>
-
+<!---
 #SEE ALSO
 `pgv(1)`
+-->

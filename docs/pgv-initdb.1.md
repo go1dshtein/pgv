@@ -1,6 +1,8 @@
+<!---
 %pgv-initdb(1)
 %
 %July, 2014
+-->
 
 #NAME
 pgv initdb - initializes new database for working with *pgv*.
@@ -48,5 +50,7 @@ If you want to enable versioning on existing database:
 
 	pgv initdb -r <revision> -d mydb -h test -U test
 
+<!---
 #SEE ALSO
 `pgv (1)`
+-->
