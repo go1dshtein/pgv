@@ -1,16 +1,10 @@
 #!/usr/bin/env python
-import os
 from setuptools import setup
 
-try:
-    import pypandoc
-    description = pypandoc.convert('README.md', 'rst')
-except (IOError, ImportError):
-    description = open('README.md').read()
 
 setup(name='pgv',
       version='0.0.1',
-      description=description,
+      description="PostgreSQL schema versioning tool",
       author='Kirill Goldshtein',
       author_email='goldshtein.kirill@gmail.com',
       packages=['pgv'],
@@ -19,7 +13,7 @@ setup(name='pgv',
       install_requires=['GitPython >= 0.3.1', 'psycopg2', "PyYAML"],
       test_suite='tests',
       scripts=['bin/pgv'],
-      license='GPL',
+      license='GPLv2',
       classifiers=['Intended Audience :: Developers',
                    'Environment :: Console',
                    'Programming Language :: Python :: 2.7',

@@ -57,7 +57,7 @@ class Package:
         self.format = format
 
     def _get_format(self, path):
-        if not self.format is None:
+        if self.format is not None:
             return self.format
         if path.endswith(".tar"):
             return "tar"

@@ -72,7 +72,7 @@ class Git:
                                 dict(files).viewkeys())
                     if files == [pgv.skiplist.SkipList.name]:
                         self._skiplist_only = True
-                    if not this.include is None:
+                    if this.include is not None:
                         files = set(files)
                         for pattern in this.include:
                             files |= set(fnmatch.filter(self.files(), pattern))

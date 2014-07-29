@@ -51,9 +51,9 @@ class TestVSCGit(unittest.TestCase):
         revs = list(repo.revisions(revision=hash))
         files = revs[0].change().files
         self.assertEquals(
-            files,
-            ['schemas/private/functions/test.sql',
-             'schemas/private/functions/test2.sql'])
+            set(files),
+            set(['schemas/private/functions/test.sql',
+                 'schemas/private/functions/test2.sql']))
 
     def test_change_export(self):
         repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data")
