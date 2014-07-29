@@ -19,7 +19,7 @@ def parse(filename):
             "level": "INFO",
             "bytes": 1000000,
             "count": 4,
-            "filename": os.path.join(os.getcwd(), "build", "pgv.log"),
+            "filename": os.path.join(os.getcwd(), ".pgv", "pgv.log"),
         },
         "vcs": {
             "provider": "git",
@@ -29,7 +29,7 @@ def parse(filename):
         },
         "package": {
             "format": "tar.gz",
-            "path": os.path.join(os.getcwd(), "dist", "pgv"),
+            "path": os.path.join(os.getcwd(), ".pgv", "dist.tar.gz"),
         },
         "database": {
             "isolation_level": "autocommit"

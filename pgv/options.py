@@ -138,7 +138,7 @@ class Parser:
         show.add_argument('--help', action="help")
         show.add_argument('-s', '--skipped', action="store_true",
                           help="shows only skipped revisions")
-        show.add_argument('-w', '--with-skipped', action="store_true"
+        show.add_argument('-w', '--with-skipped', action="store_true",
                           help="shows skipped revisions")
         self.add_version(show)
 

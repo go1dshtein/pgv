@@ -2,5 +2,3 @@ vcs:
   prefix: tests/data/sql
   include:
     - "schemes/*/types/*.sql"
-package:
-  path: $PWD/dist/db.tar.gz
