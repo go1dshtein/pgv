@@ -4,15 +4,15 @@
 %July, 2014
 -->
 
-#NAME
+###NAME
 pgv push - applies changes to target database.
 
-#SYNOPSYS
+###SYNOPSYS
 **pgv push** --help
 
 **pgv push** [-c] -d *DBNAME* [-h *HOST*] [-U *USERNAME*] [-w|-W] [-i *PATH*] [-F *FORMAT*]
 
-#DESCRIPTION
+###DESCRIPTION
 **pgv push** reads package with changes and executes SQL scripts from it on database.
 
 #OPTIONS
@@ -28,7 +28,7 @@ pgv push - applies changes to target database.
 -F *FORMAT* --format *FORMAT*
 :	format of package;
 
-#CONNECTION OPTIONS
+###CONNECTION OPTIONS
 -d *DBNAME* --dbname *DBNAME*
 :	name of target database;
 
@@ -47,7 +47,7 @@ pgv push - applies changes to target database.
 -W --password
 :	ask for password.
 
-#EXAMPLES
+###EXAMPLES
 For example, you have collected package and want to push it to database *test*:
 
 	pgv push -d test

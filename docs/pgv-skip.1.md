@@ -4,15 +4,15 @@
 %July, 2014
 -->
 
-#NAME
+###NAME
 pgv skip - skips some changes from collecting to package.
 
-#SYNOPSYS
+###SYNOPSYS
 **pgv skip** --help
 
 **pgv skip** [[-f FILENAME] ...] REVISION
 
-#DESCRIPTION
+###DESCRIPTION
 Sometimes it is needed to skip some changes from collecting to package.
 So, you can skip whole revision or just few files from it.
 
@@ -25,14 +25,14 @@ When **pgv** collects changes to package
 it looks for skiplist in last(newest) revision.
 So changes in the *skiplist* can alterate resulting schema in a database.
 
-#OPTIONS
+###OPTIONS
 -f *FILENAME* --filename *FILENAME*
 :       skip only selected file;
 
 *REVISION*
 :       skip chnage with *REVISION*.
 
-#EXAMPLES
+###EXAMPLES
 If you want to skip "bad" revision:
 
 	pgv skip <revision>

@@ -4,15 +4,15 @@
 %July, 2014
 -->
 
-#NAME
-pgv show - shows revision in the repository.
+###NAME
+pgv show - shows revisions in the repository.
 
-#SYNOPSYS
+###SYNOPSYS
 **pgv show** --help
 
 **pgv show** [-s|-w] [-f REVISION] [-t REVISION]
 
-#OPTIONS
+###OPTIONS
 -s --skipped
 :       shows only skipped changes;
 
@@ -25,7 +25,7 @@ pgv show - shows revision in the repository.
 -t *REVISION* --to *REVISION*
 :	no collect changes newer then *REVISION*.
 
-#EXAMPLES
+###EXAMPLES
 You can see changes that will be collected:
 
 	pgv show

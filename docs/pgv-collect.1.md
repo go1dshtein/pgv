@@ -4,10 +4,10 @@
 %July, 2014
 -->
 
-#NAME
-pgv collect - collect changes into package.
+###NAME
+pgv collect - collects changes into package.
 
-#SYNOPSYS
+###SYNOPSYS
 **pgv collect** [--help]
 
 **pgv collect** [-f *REVISION*] [-t *REVISION*] [-o *PATH*] [-F *FORMAT*]
@@ -15,12 +15,12 @@ pgv collect - collect changes into package.
 **pgv collect** -d *DBNAME* [-h *HOST*] [-p *PORT*] [-U *USERNAME*] [-w|-W]
 [-o *PATH*] [-F *FORMAT*]
 
-#DESCRIPTION
+###DESCRIPTION
 **pgv collect** collects changes to package which one can be pushed to database.
 
 If *DBNAME* is defined then *pgv* gets miniman revision(_--from_ analogue) from database.
 
-#OPTIONS
+###OPTIONS
 --help
 :	print help and exit;
 
@@ -36,7 +36,7 @@ If *DBNAME* is defined then *pgv* gets miniman revision(_--from_ analogue) from 
 -t *REVISION* --to *REVISION*
 :	no collect changes newer then *REVISION*.
 
-#CONNECTION OPTIONS
+###CONNECTION OPTIONS
 -d *DBNAME* --dbname *DBNAME*
 :	name of target database;
 
@@ -55,7 +55,7 @@ If *DBNAME* is defined then *pgv* gets miniman revision(_--from_ analogue) from 
 -W --password
 :	ask for password.
 
-#EXAMPLES
+###EXAMPLES
 If you want to collect changes into the package on default path:
 
 	pgv collect

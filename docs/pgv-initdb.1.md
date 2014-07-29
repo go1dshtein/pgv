@@ -4,25 +4,25 @@
 %July, 2014
 -->
 
-#NAME
+###NAME
 pgv initdb - initializes new database for working with *pgv*.
 
-#SYNOPSYS
+###SYNOPSYS
 **pgv init** --help
 
 **pgv init** [-o] [-r REVISION] -d DBNAME [-h HOST] [-p PORT] [-U USERNAME] [-w|-W]
 
-#DESCRIPTION
+###DESCRIPTION
 **pgv init** creates schema in the database for tracking changes.
 
-#OPTIONS
+###OPTIONS
 -o --overwrite
 :	recreates schema in the database if it is already exists;
 
 -r *REVISION*
 :	mark that database is updated to revision.
 
-#CONNECTION OPTIONS
+###CONNECTION OPTIONS
 -d *DBNAME* --dbname *DBNAME*
 :	name of target database;
 
@@ -41,7 +41,7 @@ pgv initdb - initializes new database for working with *pgv*.
 -W --password
 :	ask for password.
 
-#EXAMPLES
+###EXAMPLES
 Before pushing changes to new database, you should initialize it:
 
 	pgv initdb -d mydb -h test -U test
