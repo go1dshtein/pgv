@@ -6,7 +6,7 @@ import pgv.initializer
 import pgv.package
 import pgv.skiplist
 import pgv.viewer
-import pgv.utils
+import pgv.utils.misc
 
 logger = logging.getLogger(__file__)
 
@@ -17,7 +17,7 @@ class Application:
         self.options = options
 
     def do_initdb(self):
-        connection = pgv.utils.get_connection_string(self.options)
+        connection = pgv.utils.misc.get_connection_string(self.options)
         initializer = pgv.initializer.Initializer(connection)
         if self.options.revision:
             builder = pgv.builder.Builder(self.config)
@@ -32,7 +32,7 @@ class Application:
 
     def do_collect(self):
         if self.options.dbname and not self.options.from_rev:
-            connection = pgv.utils.get_connection_string(self.options)
+            connection = pgv.utils.misc.get_connection_string(self.options)
             installer = pgv.installer.Installer(connection)
             from_rev = installer.get_revision()
         else:
@@ -49,8 +49,8 @@ class Application:
 
     def do_push(self):
         installer = pgv.installer.Installer(
-            pgv.utils.get_connection_string(self.options),
-            pgv.utils.get_isolation_level(
+            pgv.utils.misc.get_connection_string(self.options),
+            pgv.utils.misc.get_isolation_level(
                 self.config.database.isolation_level))
 
         if self.options.collect:

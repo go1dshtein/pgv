@@ -4,7 +4,7 @@ import logging
 import yaml
 import pgv.installer
 import pgv.package
-import pgv.utils.utils
+import pgv.utils.misc
 import pgv.config
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ class Initializer:
         current = os.getcwd()
         config = os.path.join(current, pgv.config.name)
         if not os.path.exists(config):
-            config = pgv.utils.utils.search_config()
+            config = pgv.utils.misc.search_config()
         if config:
             logger.warning("repository is initialized already:")
             logger.warning("  see: %s", config)
