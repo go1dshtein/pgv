@@ -7,7 +7,7 @@ import pgv.skiplist
 class TestSkipList(unittest.TestCase):
     def setUp(self):
         self.url = os.path.join(os.path.dirname(__file__), "..")
-        self.repo = pgv.vcs.Git(url="file://%s" % self.url,
+        self.repo = pgv.vcs.get("git", url="file://%s" % self.url,
                                 prefix="tests/data/sql")
         config = type("C", (object,), {"dirname": self.url})
         self.config = type("C", (object,), {"config": config})
@@ -33,7 +33,7 @@ class TestSkipList(unittest.TestCase):
             ["schemas/public/types/data.sql"])
 
     def test_read_rev(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url,
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="test/data/sql")
         skiplist = pgv.skiplist.SkipList(self.config, vcs=repo)
         skips = skiplist.load("edf79e098b6321ffa118085fcb2b5776953a314b")

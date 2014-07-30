@@ -4,7 +4,8 @@ import logging
 import yaml
 import pgv.installer
 import pgv.package
-import pgv.utils
+import pgv.utils.utils
+import pgv.config
 
 logger = logging.getLogger(__name__)
 
@@ -31,16 +32,16 @@ class Initializer:
 
     def initialize_repo(self, prefix=""):
         current = os.getcwd()
-        config = os.path.join(current, ".pgv")
+        config = os.path.join(current, pgv.config.name)
         if not os.path.exists(config):
-            config = pgv.utils.search_config()
+            config = pgv.utils.utils.search_config()
         if config:
             logger.warning("repository is initialized already:")
             logger.warning("  see: %s", config)
             return
         logger.info("initializing repository")
         current = os.getcwd()
-        config = os.path.join(current, ".pgv")
+        config = os.path.join(current, pgv.config.name)
         with open(config, "w") as h:
             h.write(yaml.dump({"vcs": {"prefix": prefix}},
                               default_flow_style=False))

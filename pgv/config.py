@@ -5,6 +5,9 @@ import yaml
 import re
 
 
+name = "pgv.yaml"
+
+
 def parse(filename):
     pattern = re.compile(r"\$(\w+)", re.U)
     filename = os.path.realpath(filename) if filename else filename

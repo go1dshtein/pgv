@@ -3,6 +3,7 @@ import logging
 import logging.handlers
 import getpass
 import psycopg2
+import pgv.config
 
 
 def setup_logging(config):
@@ -57,11 +58,11 @@ def search_config(filename=None):
     if filename is not None:
         return filename
 
-    filename = os.path.join(os.getcwd(), ".pgv")
+    filename = os.path.join(os.getcwd(), pgv.config.name)
     while not os.path.isfile(filename):
         dirname = os.path.dirname(filename)
         if dirname == "/":
             return None
-        filename = os.path.join(dirname, "..", ".pgv")
+        filename = os.path.join(dirname, "..", pgv.config.name)
         filename = os.path.realpath(filename)
     return filename

@@ -9,19 +9,21 @@ class TestVSCGit(unittest.TestCase):
         self.url = os.path.join(os.path.dirname(__file__), "..")
 
     def test_count_simple(self):
-        fullrepo = pgv.vcs.Git(url="file://%s" % self.url)
+        fullrepo = pgv.vcs.get("git", url="file://%s" % self.url)
         self.assertTrue(len(list(fullrepo.revisions())) > 3)
 
     def test_filter_path(self):
-        fullrepo = pgv.vcs.Git(url="file://%s" % self.url)
-        repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data")
+        fullrepo = pgv.vcs.get("git", url="file://%s" % self.url)
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
+                           prefix="test/data")
         full_count = len(list(fullrepo.revisions()))
         count = len(list(repo.revisions()))
         self.assertTrue(count < full_count)
         self.assertTrue(count > 1)
 
     def test_revision(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data")
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
+                           prefix="test/data")
         hash = "ec53903436426b460fd5de84896fe6648bff7b2b"
         revs = list(repo.revisions(revision=hash))
         self.assertTrue(len(revs) == 1)
@@ -30,7 +32,8 @@ class TestVSCGit(unittest.TestCase):
 
     def test_revision_range(self):
         # begin version already installed
-        repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data")
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
+                           prefix="test/data")
         begin = "ec53903436426b460fd5de84896fe6648bff7b2b"
         end = "4ee81f40ea3593c6689d52fc9d5048072b6399db"
         revs = list(repo.revisions(begin=begin, end=end))
@@ -38,7 +41,8 @@ class TestVSCGit(unittest.TestCase):
         self.assertTrue(revs[0].hash() == end)
 
     def test_change_files(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data")
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
+                           prefix="test/data")
         hash = "ec53903436426b460fd5de84896fe6648bff7b2b"
         revs = list(repo.revisions(revision=hash))
         files = revs[0].change().files
@@ -46,7 +50,8 @@ class TestVSCGit(unittest.TestCase):
             files, ['schemas/private/functions/test.sql'])
 
     def test_change_files_without_insertions(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data/sql")
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
+                           prefix="test/data/sql")
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
         revs = list(repo.revisions(revision=hash))
         files = revs[0].change().files
@@ -56,7 +61,8 @@ class TestVSCGit(unittest.TestCase):
                  'schemas/private/functions/test2.sql']))
 
     def test_change_export(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url, prefix="test/data")
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
+                           prefix="test/data")
         hash = "ec53903436426b460fd5de84896fe6648bff7b2b"
         rev = list(repo.revisions(revision=hash))[0]
         tmp = tempfile.mkdtemp()
@@ -83,7 +89,7 @@ class TestVSCGit(unittest.TestCase):
             shutil.rmtree(tmp)
 
     def test_change_export_include(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url,
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="test/data/sql",
                            include=("schemas/*/types/*.sql",))
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
@@ -100,7 +106,7 @@ class TestVSCGit(unittest.TestCase):
             shutil.rmtree(tmp)
 
     def test_revision_files(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url,
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="test/data/sql",
                            include=("schemas/*/types/*.sql",))
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
@@ -117,7 +123,7 @@ class TestVSCGit(unittest.TestCase):
              'schemas/public/types/data.sql'])
 
     def test_skiplist_only(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url,
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="test/data/sql",
                            include=("schemas/*/types/*.sql",))
         hash1 = "edf79e098b6321ffa118085fcb2b5776953a314b"
@@ -128,7 +134,7 @@ class TestVSCGit(unittest.TestCase):
         self.assertFalse(rev.skiplist_only())
 
     def test_branch_unmerged(self):
-        repo = pgv.vcs.Git(url="file://%s" % self.url,
+        repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="tests/data/sql",
                            include=("schemas/*/types/*.sql",))
         hash1 = "master"

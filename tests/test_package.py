@@ -10,7 +10,7 @@ import pgv.package
 class TestPackage(unittest.TestCase):
     def setUp(self):
         url = os.path.join(os.path.dirname(__file__), "..")
-        repo = pgv.vcs.Git(url="file://%s" % url,
+        repo = pgv.vcs.get("git", url="file://%s" % url,
                            prefix="test/data/sql",
                            include=("schemas/*",))
         self.revision = repo.revision(

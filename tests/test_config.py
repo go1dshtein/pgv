@@ -19,7 +19,7 @@ class TestConfig(unittest.TestCase):
         config = pgv.config.parse(self.yaml_file)
         self.assertEquals(
             config.logging.filename,
-            os.path.join(os.getcwd(), "build", "pgv.log"))
+            os.path.join(os.getcwd(), ".pgv", "pgv.log"))
         self.assertEquals(config.logging.level, "INFO")
         self.assertEquals(config.logging.bytes, 1000000)
         self.assertEquals(config.logging.count, 4)
