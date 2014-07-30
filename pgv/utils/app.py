@@ -1,12 +1,12 @@
 import os
 import logging
 import pgv.installer
-import pgv.initializer
 import pgv.package
 import pgv.skiplist
 import pgv.viewer
 import pgv.utils.misc
 from pgv.collector import Collector
+from pgv.initializer import DatabaseInitializer, RepositoryInitializer
 
 logger = logging.getLogger(__file__)
 
@@ -18,18 +18,18 @@ class Application:
 
     def do_initdb(self):
         connection = pgv.utils.misc.get_connection_string(self.options)
-        initializer = pgv.initializer.Initializer(connection)
+        initializer = DatabaseInitializer(connection)
         if self.options.revision:
             vcs = pgv.vcs.get(**self.config.vcs.__dict__)
             collector = Collector(vcs, self.config.config.dirname)
             revisions = map(
                 lambda x: x[0].hash(),
                 collector.revisions(to_rev=self.options.revision))
-        initializer.initialize_schema(self.options.overwrite, revisions)
+        initializer.initialize(self.options.overwrite, revisions)
 
     def do_init(self):
-        initializer = pgv.initializer.Initializer()
-        initializer.initialize_repo(self.options.prefix)
+        initializer = RepositoryInitializer()
+        initializer.initialize(self.options.prefix)
 
     def do_collect(self):
         if self.options.dbname and not self.options.from_rev:

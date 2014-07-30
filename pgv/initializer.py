@@ -10,17 +10,14 @@ import pgv.config
 logger = logging.getLogger(__name__)
 
 
-class Initializer:
+class DatabaseInitializer:
     schema = pgv.installer.Installer.schema
-    init_script = os.path.join(os.path.dirname(__file__), 'init', 'init.sql')
+    init_script = os.path.join(os.path.dirname(__file__), 'data', 'init.sql')
 
-    def __init__(self, constring=None):
-        if constring:
-            self.repo_only = False
-            logger.debug("connection string: %s", constring)
-            self.connection = psycopg2.connect(constring)
+    def __init__(self, connstring):
+        self.connection = psycopg2.connect(connstring)
 
-    def is_installed(self):
+    def _is_installed(self):
         query = """
             select count(*)
               from pg_catalog.pg_namespace n
@@ -30,36 +27,8 @@ class Initializer:
             count = cursor.fetchone()[0]
         return count > 0
 
-    def initialize_repo(self, prefix=""):
-        current = os.getcwd()
-        config = os.path.join(current, pgv.config.name)
-        if not os.path.exists(config):
-            config = pgv.utils.misc.search_config()
-        if config:
-            logger.warning("repository is initialized already:")
-            logger.warning("  see: %s", config)
-            return
-        logger.info("initializing repository")
-        current = os.getcwd()
-        config = os.path.join(current, pgv.config.name)
-        with open(config, "w") as h:
-            h.write(yaml.dump({"vcs": {"prefix": prefix}},
-                              default_flow_style=False))
-        schemas = os.path.join(
-            current, prefix, pgv.package.Package.schemas_dir)
-        scripts = os.path.join(
-            current, prefix, pgv.package.Package.scripts_dir)
-        if os.path.exists(schemas):
-            logging.warning("%s already exists, skipping ...", schemas)
-        else:
-            os.makedirs(schemas)
-        if os.path.exists(scripts):
-            logging.warning("%s already exists, skipping ...", scripts)
-        else:
-            os.makedirs(scripts)
-
-    def initialize_schema(self, overwrite=False, revisions=None):
-        if self.is_installed():
+    def initialize(self, overwrite=False, revisions=None):
+        if self._is_installed():
             logger.warning("%s schema is installed already", self.schema)
             if not overwrite:
                 return
@@ -79,3 +48,37 @@ class Initializer:
                     cursor.callproc("%s.commit" % self.schema, (revision,))
 
         self.connection.commit()
+
+
+class RepositoryInitializer:
+    def _is_config(self, current):
+        config = os.path.join(current, pgv.config.name)
+        if not os.path.exists(config):
+            config = pgv.utils.misc.search_config()
+        if config:
+            logger.warning("repository is initialized already:")
+            logger.warning("  see: %s", config)
+            return True
+        return False
+
+    def _create_config(self, current):
+        logger.info("initializing repository")
+        config = os.path.join(current, pgv.config.name)
+        with open(config, "w") as h:
+            h.write(yaml.dump({"vcs": {"prefix": prefix}},
+                              default_flow_style=False))
+
+    def _create_directory(self, name, current):
+        dirname = os.path.join(current, prefix, name)
+        if os.path.exists(dirname):
+            logging.warning("%s already exists, skipping ...", name)
+        else:
+            os.makedirs(dirname)
+
+    def initialize(self, prefix=""):
+        current = os.getcwd()
+        if self._is_config(current):
+            return
+        self._create_config(current)
+        self._create_directory(pgv.package.Package.schemas_dir, current)
+        self._create_directory(pgv.package.Package.scripts_dir, current)
