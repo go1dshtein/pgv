@@ -2,11 +2,11 @@ import os
 import logging
 import pgv.installer
 import pgv.package
-import pgv.skiplist
-import pgv.viewer
 import pgv.utils.misc
 from pgv.collector import Collector
 from pgv.initializer import DatabaseInitializer, RepositoryInitializer
+from pgv.viewer import Viewer
+from pgv.skiplist import SkipList
 
 logger = logging.getLogger(__file__)
 
@@ -60,19 +60,18 @@ class Application:
             package = pgv.package.Package()
 
         path = self.options.input or self.config.package.path
-        if self.options.collect:
-            package.save(path)
-        else:
+        if not self.options.collect:
             package.load(path)
         installer.install(package)
 
     def do_skip(self):
         vcs = pgv.vcs.get(**self.config.vcs.__dict__)
-        skiplist = pgv.skiplist.SkipList(vcs, self.config.config.dirname)
+        skiplist = SkipList(vcs, self.config.config.dirname)
         skiplist.add(self.options.revision, self.options.filename)
 
     def do_show(self):
-        viewer = pgv.viewer.Viewer(self.config)
+        vcs = pgv.vcs.get(**self.config.vcs.__dict__)
+        viewer = Viewer(vcs, self.config.config.dirname)
         if self.options.skipped:
             viewer.show_skipped(self.options.to_rev)
         else:

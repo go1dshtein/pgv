@@ -1,14 +1,11 @@
 import os
-
-import pgv.vcs
 import pgv.skiplist
 
 
 class Viewer:
-    def __init__(self, config):
-        self.vcs = pgv.vcs.get(**config.vcs.__dict__)
-        self.skiplist = pgv.skiplist.SkipList(
-            self.vcs, self.config.config.dirname)
+    def __init__(self, vcs, workdir):
+        self.vcs = vcs
+        self.skiplist = pgv.skiplist.SkipList(vcs, workdir)
 
     def show(self, with_skipped, from_rev=None, to_rev=None):
         revlist = list(self.vcs.revisions(begin=from_rev, end=to_rev))
