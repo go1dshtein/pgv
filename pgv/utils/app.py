@@ -1,12 +1,12 @@
 import os
 import logging
 import pgv.installer
-import pgv.builder
 import pgv.initializer
 import pgv.package
 import pgv.skiplist
 import pgv.viewer
 import pgv.utils.misc
+from pgv.collector import Collector
 
 logger = logging.getLogger(__file__)
 
@@ -20,10 +20,11 @@ class Application:
         connection = pgv.utils.misc.get_connection_string(self.options)
         initializer = pgv.initializer.Initializer(connection)
         if self.options.revision:
-            builder = pgv.builder.Builder(self.config)
+            vcs = pgv.vcs.get(**self.config.vcs.__dict__)
+            collector = Collector(vcs, self.config.config.dirname)
             revisions = map(
                 lambda x: x[0].hash(),
-                builder.get_revisions(to_rev=self.options.revision))
+                collector.revisions(to_rev=self.options.revision))
         initializer.initialize_schema(self.options.overwrite, revisions)
 
     def do_init(self):
@@ -38,14 +39,11 @@ class Application:
         else:
             from_rev = self.options.from_rev
 
-        builder = pgv.builder.Builder(self.config)
-        package = builder.make(from_rev=from_rev,
-                               to_rev=self.options.to_rev,
-                               format=self.options.format)
-        path = self.options.output
-        if path is None:
-            path = self.config.package.path
-        package.save(path)
+        path = self.options.output or self.config.package.path
+        vcs = pgv.vcs.get(**self.config.vcs.__dict__)
+        collector = Collector(vcs, self.config.config.dirname)
+        package = collector.collect(from_rev, self.options.to_rev)
+        package.save(path, self.options.format)
 
     def do_push(self):
         installer = pgv.installer.Installer(
@@ -54,19 +52,18 @@ class Application:
                 self.config.database.isolation_level))
 
         if self.options.collect:
-            builder = pgv.builder.Builder(self.config)
+            vcs = pgv.vcs.get(**self.config.vcs.__dict__)
+            collector = Collector(vcs, self.config.config.dirname)
             from_rev = installer.get_revision()
-            package = builder.make(from_rev=from_rev,
-                                   format=self.options.format)
+            package = collector.collect(from_rev=from_rev)
         else:
-            package = pgv.package.Package(self.config.package.format)
+            package = pgv.package.Package()
 
-        path = self.options.input
-        if path is None:
-            path = self.config.package.path
+        path = self.options.input or self.config.package.path
         if self.options.collect:
             package.save(path)
-        package.load(path)
+        else:
+            package.load(path)
         installer.install(package)
 
     def do_skip(self):

@@ -6,7 +6,6 @@ import collections
 import logging
 import itertools
 import fnmatch
-
 import pgv.format
 
 logger = logging.getLogger(__name__)
@@ -51,14 +50,13 @@ class Package:
         "stop":     "stop"
     }
 
-    def __init__(self, format):
+    def __init__(self):
         self.tmpdir = tempfile.mkdtemp(prefix="pgv-package")
         self.revlist = RevList(self.tmpdir)
-        self.format = format
 
-    def _get_format(self, path):
-        if self.format is not None:
-            return self.format
+    def _get_format(self, path, format=None):
+        if format is not None:
+            return format
         if path.endswith(".tar"):
             return "tar"
         elif path.endswith(".tar.gz"):
@@ -84,13 +82,13 @@ class Package:
             logger.warning("script %s has unknown event name",
                            script[len(self.tmpdir):].lstrip('/'))
 
-    def save(self, path):
+    def save(self, path, format=None):
         self.revlist.save()
         self._check()
-        pgv.format.get(self._get_format(path)).save(self.tmpdir, path)
+        pgv.format.get(self._get_format(path, format)).save(self.tmpdir, path)
 
-    def load(self, path):
-        pgv.format.get(self._get_format(path)).load(path, self.tmpdir)
+    def load(self, path, format=None):
+        pgv.format.get(self._get_format(path, format)).load(path, self.tmpdir)
         self.revlist.load()
 
     def _get_files(self, root):

@@ -17,14 +17,14 @@ class TestPackage(unittest.TestCase):
             "0d6a6d428e1819073fd666cca248aa06eecaaaf4")
 
     def test_package_add(self):
-        package = pgv.package.Package("directory")
+        package = pgv.package.Package()
         package.add(self.revision)
         self.assertEquals(
             list(package.revlist),
             ["0d6a6d428e1819073fd666cca248aa06eecaaaf4"])
 
     def test_package_scripts(self):
-        package = pgv.package.Package("directory")
+        package = pgv.package.Package()
         package.add(self.revision)
         scripts = package.scripts(self.revision.hash(), "error")
         self.assertEquals(map(lambda x: os.path.basename(x), scripts),
@@ -49,14 +49,14 @@ class TestPackage(unittest.TestCase):
                           (self.revision.hash(), "unknown"))
 
     def test_package_schemas(self):
-        package = pgv.package.Package("directory")
+        package = pgv.package.Package()
         package.add(self.revision)
         self.assertEquals(
             package.schemas(self.revision.hash()),
             ["private", "public"])
 
     def test_package_schema_files(self):
-        package = pgv.package.Package("directory")
+        package = pgv.package.Package()
         package.add(self.revision)
         files = package.schema_files(self.revision.hash(), "public")
         self.assertEquals(map(lambda x: os.path.basename(x), files),
@@ -70,11 +70,11 @@ class TestPackage(unittest.TestCase):
 
             pgv.package.logger.warning = logger_hook
 
-            package1 = pgv.package.Package("tar.gz")
+            package1 = pgv.package.Package()
             package1.add(self.revision)
-            package1.save(directory)
-            package2 = pgv.package.Package("tar.gz")
-            package2.load(directory)
+            package1.save(directory, "tar.gz")
+            package2 = pgv.package.Package()
+            package2.load(directory, "tar.gz")
             self.assertEquals(
                 package1.schemas(self.revision.hash()),
                 package2.schemas(self.revision.hash()))

@@ -31,7 +31,6 @@ def parse(filename):
             "include": None,
         },
         "package": {
-            "format": "tar.gz",
             "path": os.path.join(os.getcwd(), ".pgv", "dist.tar.gz"),
         },
         "database": {
