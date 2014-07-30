@@ -70,7 +70,8 @@ class Application:
         installer.install(package)
 
     def do_skip(self):
-        skiplist = pgv.skiplist.SkipList(self.config)
+        vcs = pgv.vcs.get(**self.config.vcs.__dict__)
+        skiplist = pgv.skiplist.SkipList(vcs, self.config.config.dirname)
         skiplist.add(self.options.revision, self.options.filename)
 
     def do_show(self):

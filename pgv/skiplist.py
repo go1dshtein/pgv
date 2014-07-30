@@ -13,10 +13,9 @@ logger = logging.getLogger(__name__)
 class SkipList:
     name = ".skiplist"
 
-    def __init__(self, config, vcs=None):
-        self.config = config
-        self.vcs = vcs or pgv.vcs.get(**config.vcs.__dict__)
-        self.prefix = self.vcs.prefix
+    def __init__(self, vcs, workdir):
+        self.vcs = vcs
+        self.local_path = os.path.join(workdir, self.vcs.prefix, self.name)
 
     def _parse(self, data):
         data = yaml.load(data)
@@ -31,10 +30,8 @@ class SkipList:
             return dict()
 
     def _save_local(self, data):
-        filename = os.path.join(self.config.config.dirname,
-                                self.prefix, self.name)
         data = yaml.dump(data, default_flow_style=False)
-        with open(filename, "w") as h:
+        with open(self.local_path, "w") as h:
             h.write(data)
 
     def add(self, revision, patterns=None):
@@ -67,7 +64,5 @@ class SkipList:
                 shutil.rmtree(tmpdir)
 
     def load_local(self):
-        filename = os.path.join(self.config.config.dirname,
-                                self.prefix, self.name)
-        logger.debug("loading local skiplist: %s", filename)
-        return self._read(filename)
+        logger.debug("loading local skiplist: %s", self.local_path)
+        return self._read(self.local_path)

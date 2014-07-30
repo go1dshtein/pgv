@@ -12,7 +12,8 @@ class Builder:
     def __init__(self, config, **kwargs):
         self.config = config
         self.vcs = pgv.vcs.get(**config.vcs.__dict__)
-        self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
+        self.skiplist = pgv.skiplist.SkipList(
+            self.vcs, self.config.config.dirname)
 
     def get_revisions(self, from_rev=None, to_rev=None):
         skiplist = self.skiplist.load(to_rev)

@@ -5,7 +5,7 @@ import pgv.config
 import psycopg2
 
 
-class TestUtilsIsolationLevel(unittest.TestCase):
+class TestMiscIsolationLevel(unittest.TestCase):
     def test_isolation_level_autocommit(self):
         s_level = "autocommit"
         p_level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
@@ -36,7 +36,7 @@ class TestUtilsIsolationLevel(unittest.TestCase):
             Exception, pgv.utils.misc.get_isolation_level, (s_level,))
 
 
-class TestUtilsSearchConfig(unittest.TestCase):
+class TestMiscSearchConfig(unittest.TestCase):
     def setUp(self):
         self.dirname = os.path.join(os.path.dirname(__file__),
                                     "data", "utils", "pgv")
