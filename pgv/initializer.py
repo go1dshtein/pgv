@@ -27,6 +27,24 @@ class DatabaseInitializer:
             count = cursor.fetchone()[0]
         return count > 0
 
+    def _read_script(self):
+        with open(self.init_script) as h:
+            return h.read()
+
+    def _push_script(self, script):
+        with self.connection.cursor() as cursor:
+            logger.debug(script)
+            cursor.execute(script)
+
+    def _mark_revisions(self, revisions):
+        if not revisions:
+            return
+        with self.connection.cursor() as cursor:
+            for revision in revisions:
+                logger.warning("marking revision %s as installed",
+                               revision)
+                cursor.callproc("%s.commit" % self.schema, (revision,))
+
     def initialize(self, overwrite=False, revisions=None):
         if self._is_installed():
             logger.warning("%s schema is installed already", self.schema)
@@ -34,19 +52,9 @@ class DatabaseInitializer:
                 return
             logger.warning("overwriting schema %s ...", self.schema)
 
-        with open(self.init_script) as h:
-            script = h.read()
-
-        with self.connection.cursor() as cursor:
-            logger.debug(script)
-            cursor.execute(script)
-
-            if revisions:
-                for revision in revisions:
-                    logger.warning("marking revision %s as installed",
-                                   revision)
-                    cursor.callproc("%s.commit" % self.schema, (revision,))
-
+        script = self._read_script()
+        self._push_script(script)
+        self._mark_revisions(revisions)
         self.connection.commit()
 
 
