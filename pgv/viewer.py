@@ -6,10 +6,7 @@ import pgv.skiplist
 
 class Viewer:
     def __init__(self, config):
-        self.vcs = pgv.vcs.get(config.vcs.provider,
-                               url=config.vcs.url,
-                               prefix=config.vcs.prefix,
-                               include=config.vcs.include)
+        self.vcs = pgv.vcs.get(**config.vcs.__dict__)
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
     def show(self, with_skipped, from_rev=None, to_rev=None):

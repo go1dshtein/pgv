@@ -11,10 +11,7 @@ logger = logging.getLogger(__name__)
 class Builder:
     def __init__(self, config, **kwargs):
         self.config = config
-        self.vcs = pgv.vcs.get(config.vcs.provider,
-                               url=config.vcs.url,
-                               prefix=config.vcs.prefix,
-                               include=config.vcs.include)
+        self.vcs = pgv.vcs.get(**config.vcs.__dict__)
         self.skiplist = pgv.skiplist.SkipList(config, vcs=self.vcs)
 
     def get_revisions(self, from_rev=None, to_rev=None):

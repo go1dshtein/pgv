@@ -15,14 +15,7 @@ class SkipList:
 
     def __init__(self, config, vcs=None):
         self.config = config
-        if vcs:
-            self.vcs = vcs
-        else:
-            self.vcs = pgv.vcs.get(config.vcs.provider,
-                                   url=config.vcs.url,
-                                   prefix=config.vcs.prefix,
-                                   include=config.vcs.include)
-
+        self.vcs = vcs or pgv.vcs.get(**config.vcs.__dict__)
         self.prefix = self.vcs.prefix
 
     def _parse(self, data):
