@@ -33,7 +33,7 @@ class TestMiscIsolationLevel(unittest.TestCase):
     def test_isolation_level_unknown(self):
         s_level = "unknown"
         self.assertRaises(
-            Exception, pgv.utils.misc.get_isolation_level, (s_level,))
+            Exception, pgv.utils.misc.get_isolation_level, s_level)
 
 
 class TestMiscSearchConfig(unittest.TestCase):

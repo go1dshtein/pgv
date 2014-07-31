@@ -46,7 +46,7 @@ class TestPackage(unittest.TestCase):
                           ["test6_stop.sql"])
         self.assertRaises(Exception,
                           package.scripts,
-                          (self.revision.hash(), "unknown"))
+                          self.revision.hash(), "unknown")
 
     def test_package_schemas(self):
         package = pgv.package.Package()

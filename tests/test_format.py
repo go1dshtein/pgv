@@ -83,4 +83,4 @@ class TestFormat(unittest.TestCase):
                 shutil.rmtree(dst)
 
     def test_unknown(self):
-        self.assertRaises(Exception, pgv.format.get, ("unknown",))
+        self.assertRaises(Exception, pgv.format.get, "unknown")

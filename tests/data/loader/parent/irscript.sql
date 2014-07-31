@@ -1,0 +1,2 @@
+irscript
+\ir ./simple.sql

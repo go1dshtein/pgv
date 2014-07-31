@@ -19,12 +19,15 @@ class Application:
     def do_initdb(self):
         connection = pgv.utils.misc.get_connection_string(self.options)
         initializer = DatabaseInitializer(connection)
+
+        revisions = None
         if self.options.revision:
             vcs = pgv.vcs.get(**self.config.vcs.__dict__)
             collector = Collector(vcs, self.config.config.dirname)
             revisions = map(
                 lambda x: x[0].hash(),
                 collector.revisions(to_rev=self.options.revision))
+
         initializer.initialize(self.options.overwrite, revisions)
 
     def do_init(self):
