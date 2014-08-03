@@ -2,6 +2,8 @@ import pgv.vcs_provider
 from pgv.skiplist import SkipList
 import importlib
 import logging
+import itertools
+import fnmatch
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,20 @@ class Revision:
 
     def skiplist_only(self):
         raise NotImplementedError()
+
+    def filter_prefix(self, files):
+        files = itertools.ifilter(
+            lambda x: x.startswith(self.provider().prefix), files)
+        files = itertools.imap(
+            lambda x: x[len(self.provider().prefix):].lstrip('/'), files)
+        return itertools.ifilter(lambda x: x, files)
+
+    def add_included(self, files):
+        if self.provider().include is not None:
+            files = set(files)
+            for pattern in self.provider().include:
+                files |= set(fnmatch.filter(self.files(), pattern))
+        return files
 
 
 class Change:

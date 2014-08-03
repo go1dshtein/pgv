@@ -26,40 +26,18 @@ class GitChange(pgv.vcs.Change):
 class GitRevision(pgv.vcs.Revision):
     def __init__(self, provider, gitcommit):
         self._gitcommit = gitcommit
-        self._change = None
         self.provider = lambda: provider
         self.hash = lambda: gitcommit.hexsha
 
-    def _filter_files(self, file):
-        name, stat = file
-        if not name.startswith(self.provider().prefix):
-            return False
-        if stat.get('lines', 0) > 0:
-            return True
-        return False
-
     def change(self):
-        if self._change is None:
-            files = filter(self._filter_files,
-                           self._gitcommit.stats.files.viewitems())
-            files = map(lambda x: x[len(self.provider().prefix):].lstrip('/'),
-                        dict(files).viewkeys())
-            if self.provider().include is not None:
-                files = set(files)
-                for pattern in self.provider().include:
-                    files |= set(fnmatch.filter(self.files(), pattern))
-                files = list(files)
-            self._change = GitChange(self, files)
-        return self._change
+        files = self._gitcommit.stats.files.viewkeys()
+        files = self.filter_prefix(files)
+        return GitChange(self, list(self.add_included(files)))
 
     def files(self):
         files = itertools.imap(lambda y: y.path,
                                self._gitcommit.tree.traverse())
-        files = itertools.ifilter(
-            lambda x: x.startswith(self.provider().prefix), files)
-        files = itertools.imap(
-            lambda x: x[len(self.provider().prefix):].lstrip('/'), files)
-        return itertools.ifilter(lambda x: x, files)
+        return list(self.filter_prefix(files))
 
     def export(self, dest, files=None):
         if files is None:
@@ -69,14 +47,12 @@ class GitRevision(pgv.vcs.Revision):
         return self.provider()._export(dest, files, self.hash())
 
     def skiplist_only(self):
-        files = filter(self._filter_files,
-                       self._gitcommit.stats.files.viewitems())
-        files = map(lambda x: x[len(self.provider().prefix):].lstrip('/'),
-                    dict(files).viewkeys())
+        files = self._gitcommit.stats.files.viewkeys()
+        files = list(self.filter_prefix(files))
         return files == [SkipList.name]
 
 
-class Git:
+class Git(pgv.vcs.Provider):
     def __init__(self, **kwargs):
         url = kwargs["url"]
         self.prefix = kwargs.get("prefix", "")
@@ -91,7 +67,7 @@ class Git:
             return None
         return self.repo.rev_parse(revision).hexsha
 
-    def revisions(self, begin=None, end="HEAD", revision=None):
+    def revisions(self, begin=None, end="HEAD"):
         revisions = "HEAD"
         begin = self.parse(begin)
         end = self.parse(end)
@@ -99,16 +75,14 @@ class Git:
             if end is None:
                 end = "HEAD"
             revisions = "%s...%s" % (begin, end)
-        elif end is not None and revision is None:
-            revision = end
+        elif end is not None:
+            revisions = end
         if begin == end:
             revisions = begin
-        if revision is not None:
-            revisions = revision
         logger.debug("searching for %s", revisions)
         commits = self.repo.iter_commits(revisions, paths=self.prefix)
         return itertools.ifilter(
-            lambda x: x.change().files, itertools.imap(
+            lambda x: x.change().files(), itertools.imap(
                 lambda x: GitRevision(self, x), commits))
 
     def revision(self, revision):

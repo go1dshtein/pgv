@@ -42,8 +42,8 @@ class TestVSCGit(unittest.TestCase):
         repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="test/data")
         hash = "ec53903436426b460fd5de84896fe6648bff7b2b"
-        revs = list(repo.revisions(revision=hash))
-        files = revs[0].change().files()
+        rev = repo.revision(hash)
+        files = rev.change().files()
         self.assertEquals(
             files, ['schemas/private/functions/test.sql'])
 
@@ -51,8 +51,8 @@ class TestVSCGit(unittest.TestCase):
         repo = pgv.vcs.get("git", url="file://%s" % self.url,
                            prefix="test/data/sql")
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
-        revs = list(repo.revisions(revision=hash))
-        files = revs[0].change().files()
+        rev = repo.revision(hash)
+        files = rev.change().files()
         self.assertEquals(
             set(files),
             set(['schemas/private/functions/test.sql',
@@ -91,7 +91,7 @@ class TestVSCGit(unittest.TestCase):
                            prefix="test/data/sql",
                            include=("schemas/*/types/*.sql",))
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
-        rev = list(repo.revisions(revision=hash))[0]
+        rev = repo.revision(hash)
         tmp = tempfile.mkdtemp()
         try:
             rev.change().export(tmp)
@@ -108,7 +108,7 @@ class TestVSCGit(unittest.TestCase):
                            prefix="test/data/sql",
                            include=("schemas/*/types/*.sql",))
         hash = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
-        rev = list(repo.revisions(revision=hash))[0]
+        rev = repo.revision(hash)
         self.assertEquals(
             list(rev.files()),
             ['schemas',
