@@ -31,11 +31,9 @@ class DatabaseInitializer:
     def _mark_revisions(self, revisions):
         if not revisions:
             return
-        with self.connection.cursor() as cursor:
-            for revision in revisions:
-                logger.warning("marking revision %s as installed",
-                               revision)
-                cursor.callproc("%s.commit" % self.schema, (revision,))
+        for revision in revisions:
+            logger.info("marking revision %s as installed", revision)
+            self.tracker.commit(revision)
 
     def initialize(self, overwrite=False, revisions=None):
         if self.tracker.is_initialized():

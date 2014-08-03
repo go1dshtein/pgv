@@ -20,7 +20,7 @@ class Tracker:
         with self.connection.cursor() as cursor:
             cursor.callproc("%s.success" % self.schema, (script_id,))
 
-    def _commit(self, revision):
+    def commit(self, revision):
         with self.connection.cursor() as cursor:
             cursor.callproc("%s.commit" % self.schema, (revision,))
 

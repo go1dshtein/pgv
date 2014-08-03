@@ -58,7 +58,7 @@ class Application:
         if self.options.collect:
             vcs = pgv.vcs.get(**self.config.vcs.__dict__)
             collector = Collector(vcs, self.config.config.dirname)
-            from_rev = installer.get_revision()
+            from_rev = installer.tracker.revision()
             package = collector.collect(from_rev=from_rev)
         else:
             package = pgv.package.Package()

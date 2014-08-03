@@ -46,20 +46,19 @@ class Installer:
                 continue
 
             logger.info("installing revision %s", revision)
-            with self.tracker.revision(revision):
-                with self.revision(package, revision):
-                    directory = os.path.join(package.tmpdir, revision)
-                    loader = pgv.loader.Loader(directory)
-                    for schema in package.schemas():
-                        logger.info("  schema %s", schema)
-                        with self.schema(package, revision):
-                            for filename in package.schema_files(schema):
-                                logger.info("    script %s", filename)
-                                script = loader.load(filename)
-                                with self.script(package, revision):
-                                    with self.tracker.script(filename):
-                                        with self.connection.cursor() as c:
-                                            c.execute(script)
+            with self.revision(package, revision):
+                directory = os.path.join(package.tmpdir, revision)
+                loader = pgv.loader.Loader(directory)
+                for schema in package.schemas(revision):
+                    logger.info("  schema %s", schema)
+                    with self.schema(package, revision):
+                        for filename in package.schema_files(revision, schema):
+                            logger.info("    script %s", filename)
+                            script = loader.load(filename)
+                            with self.script(package, revision):
+                                with self.tracker.script(filename):
+                                    with self.connection.cursor() as c:
+                                        c.execute(script)
 
             if not self.connection.autocommit:
                 self.connection.commit()
@@ -73,6 +72,8 @@ class Installer:
 
             def __exit__(self, type, value, tb):
                 this._run_scripts(package, revision, this.events.stop)
+                if type is None:
+                    this.tracker.commit(revision)
                 return type is None
 
         return RevisionInstaller()

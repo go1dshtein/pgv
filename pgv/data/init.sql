@@ -6,7 +6,7 @@ create table if not exists pgv.revisions(
   revisions_id bigserial primary key,
   revision character varying(127) unique not null,
   time timestamp not null default current_timestamp,
-  meta json not null default '{}::json'
+  meta json not null default '{}'
 );
 
 create table if not exists pgv.scripts(
