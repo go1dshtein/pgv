@@ -17,32 +17,22 @@ import pgv.vcs
 logger = logging.getLogger(__name__)
 
 
-class GitChange:
+class GitChange(pgv.vcs.Change):
     def __init__(self, revision, files):
-        self.revision = revision
+        self.revision = lambda: revision
         self.files = lambda: files
 
-    def export(self, dest, skipfiles=None):
-        if skipfiles is None:
-            files = set(self.files())
-        else:
-            files = set(self.files()) - set(skipfiles)
-        return self.revision.export(dest, list(files))
 
-
-class GitRevision:
+class GitRevision(pgv.vcs.Revision):
     def __init__(self, provider, gitcommit):
         self._gitcommit = gitcommit
         self._change = None
-        self._skiplist_only = False
-        self._provider = provider
-
-    def hash(self):
-        return self._gitcommit.hexsha
+        self.provider = lambda: provider
+        self.hash = lambda: gitcommit.hexsha
 
     def _filter_files(self, file):
         name, stat = file
-        if not name.startswith(self._provider.prefix):
+        if not name.startswith(self.provider().prefix):
             return False
         if stat.get('lines', 0) > 0:
             return True
@@ -52,13 +42,11 @@ class GitRevision:
         if self._change is None:
             files = filter(self._filter_files,
                            self._gitcommit.stats.files.viewitems())
-            files = map(lambda x: x[len(self._provider.prefix):].lstrip('/'),
+            files = map(lambda x: x[len(self.provider().prefix):].lstrip('/'),
                         dict(files).viewkeys())
-            if files == [pgv.skiplist.SkipList.name]:
-                self._skiplist_only = True
-            if self._provider.include is not None:
+            if self.provider().include is not None:
                 files = set(files)
-                for pattern in self._provider.include:
+                for pattern in self.provider().include:
                     files |= set(fnmatch.filter(self.files(), pattern))
                 files = list(files)
             self._change = GitChange(self, files)
@@ -68,20 +56,17 @@ class GitRevision:
         files = itertools.imap(lambda y: y.path,
                                self._gitcommit.tree.traverse())
         files = itertools.ifilter(
-            lambda x: x.startswith(self._provider.prefix), files)
+            lambda x: x.startswith(self.provider().prefix), files)
         files = itertools.imap(
-            lambda x: x[len(self._provider.prefix):].lstrip('/'), files)
+            lambda x: x[len(self.provider().prefix):].lstrip('/'), files)
         return itertools.ifilter(lambda x: x, files)
-
-    def skiplist_only(self):
-        return self._skiplist_only
 
     def export(self, dest, files=None):
         if files is None:
             files = self.files()
         else:
             files = set(files) & set(self.files())
-        return self._provider._export(dest, files, self.hash())
+        return self.provider()._export(dest, files, self.hash())
 
 
 class Git:

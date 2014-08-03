@@ -1,4 +1,5 @@
 import pgv.vcs_provider
+from pgv.skiplist import SkipList
 import importlib
 import logging
 
@@ -18,6 +19,9 @@ class Provider:
 
 
 class Revision:
+    def provider(self):
+        raise NotImplementedError()
+
     def hash(self):
         raise NotImplementedError()
 
@@ -27,19 +31,27 @@ class Revision:
     def change(self):
         raise NotImplementedError()
 
-    def export(self):
+    def export(self, dest, files=None):
         raise NotImplementedError()
 
     def skiplist_only(self):
-        raise NotImplementedError()
+        print self.change().files()
+        return list(self.change().files()) == [SkipList.name]
 
 
 class Change:
+    def revision(sef):
+        raise NotImplementedError()
+
     def files(self):
         raise NotImplementedError()
 
-    def export(self):
-        raise NotImplementedError()
+    def export(self, dest, skipfiles=None):
+        if skipfiles is None:
+            files = set(self.files())
+        else:
+            files = set(self.files()) - set(skipfiles)
+        return self.revision().export(dest, list(files))
 
 
 def get(provider=None, **kwargs):
