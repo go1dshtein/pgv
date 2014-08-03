@@ -55,8 +55,7 @@ class SkipList:
         logger.debug("loading skiplist from repo: %s", rev)
         tmpdir = tempfile.mkdtemp()
         try:
-            self.vcs.export(tmpdir, treeish=self.vcs.parse(rev),
-                            files=(self.name,))
+            self.vcs.revision(rev).export(tmpdir, (self.name,))
             filename = os.path.join(tmpdir, self.name)
             return self._read(filename)
         finally:
