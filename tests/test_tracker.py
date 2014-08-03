@@ -37,7 +37,7 @@ class TestTracker(unittest.TestCase):
         tracker = pgv.tracker.Tracker(self.connection)
         tracker.commit(revision)
         actual = self.connection.cursor().__enter__().callproc.mock_calls
-        expected = [mock.call("%s.commit" % tracker.schema, (revision,))]
+        expected = [mock.call("%s.commit" % tracker.schema, (revision, '{}'))]
         self.assertEquals(actual, expected)
 
     def test_is_installed(self):

@@ -1,8 +1,9 @@
 import os
 import psycopg2
 import logging
-import pgv.package
-import pgv.tracker
+from itertools import chain
+from pgv.package import Package
+from pgv.tracker import Tracker
 import pgv.loader
 from pgv.utils.exceptions import PGVIsNotInitialized
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as AUTOCOMMIT
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Installer:
-    events = type("E", (object,), pgv.package.Package.events)
+    events = type("E", (object,), Package.events)
 
     def __init__(self, constring, isolation_level=None):
         if isolation_level is None:
@@ -25,7 +26,7 @@ class Installer:
         else:
             metaconn = self.connection
 
-        self.tracker = pgv.tracker.Tracker(metaconn)
+        self.tracker = Tracker(metaconn)
         if not self.tracker.is_initialized():
             raise PGVIsNotInitialized()
 
@@ -65,6 +66,11 @@ class Installer:
 
     def revision(self, package, revision):
         this = self
+        schemas = package.schemas(revision)
+        files = list(chain(
+            *[package.schema_files(revision, x) for x in schemas]))
+        scripts = list(chain(
+            *[package.scripts(revision, x) for x in Package.events]))
 
         class RevisionInstaller:
             def __enter__(self):
@@ -73,7 +79,11 @@ class Installer:
             def __exit__(self, type, value, tb):
                 this._run_scripts(package, revision, this.events.stop)
                 if type is None:
-                    this.tracker.commit(revision)
+                    this.tracker.commit(
+                        revision,
+                        schemas=schemas,
+                        files=files,
+                        scripts=scripts)
                 return type is None
 
         return RevisionInstaller()

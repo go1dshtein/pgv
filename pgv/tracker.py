@@ -1,4 +1,5 @@
 import os
+import json
 
 
 class Tracker:
@@ -20,9 +21,10 @@ class Tracker:
         with self.connection.cursor() as cursor:
             cursor.callproc("%s.success" % self.schema, (script_id,))
 
-    def commit(self, revision):
+    def commit(self, revision, **kwargs):
+        meta = json.dumps(kwargs)
         with self.connection.cursor() as cursor:
-            cursor.callproc("%s.commit" % self.schema, (revision,))
+            cursor.callproc("%s.commit" % self.schema, (revision, meta))
 
     def is_installed(self, revision):
         with self.connection.cursor() as cursor:

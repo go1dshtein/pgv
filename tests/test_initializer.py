@@ -66,8 +66,8 @@ class TestDatabaseInitializer(unittest.TestCase):
                     mock.call(self.script)]
         self.assertEquals(actual, expected)
         actual_proc = self.connection.cursor().__enter__().callproc.mock_calls
-        expected_proc = [mock.call('pgv.commit', ("0",)),
-                         mock.call('pgv.commit', ("1",))]
+        expected_proc = [mock.call('pgv.commit', ("0", "{}")),
+                         mock.call('pgv.commit', ("1", "{}"))]
         self.assertEquals(actual_proc, expected_proc)
 
 
