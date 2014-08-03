@@ -5,13 +5,8 @@ create schema pgv;
 create table if not exists pgv.revisions(
   revisions_id bigserial primary key,
   revision character varying(127) unique not null,
-  time timestamp not null default current_timestamp
-);
-
-create table if not exists pgv.versions(
-  versions_id bigserial primary key,
-  revisions_id bigint not null unique references pgv.revisions,
-  version character varying(127) unique not null
+  time timestamp not null default current_timestamp,
+  meta json not null default '{}::json'
 );
 
 create table if not exists pgv.scripts(
@@ -79,6 +74,18 @@ returns bigint as $$
     o_revisions_id bigint;
   begin
     insert into pgv.revisions (revision) values (p_revision) returning revisions_id into o_revisions_id;
+    return o_revisions_id;
+  end;
+
+$$
+language plpgsql;
+
+create or replace function pgv.commit(p_revision character varying(127), p_meta json)
+returns bigint as $$
+  declare
+    o_revisions_id bigint;
+  begin
+    insert into pgv.revisions (revision, meta) values (p_revision, p_meta) returning revisions_id into o_revisions_id;
     return o_revisions_id;
   end;
 

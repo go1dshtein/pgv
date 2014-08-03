@@ -100,6 +100,11 @@ class Package:
         basename, _ = os.path.splitext(filename)
         return basename.endswith("_" + event)
 
+    def _normalize(self, revision, files):
+        directory = os.path.join(self.tmpdir, revision)
+        files = map(lambda x: x[len(directory):].lstrip("/"), files)
+        return sorted(files)
+
     def scripts(self, revision, event):
         if event not in self.events.values():
             raise Exception("Unknown event: %s" % event)
@@ -111,7 +116,7 @@ class Package:
             return self._filter_event(filename, event)
 
         result = filter(filter_event, self._get_files(directory))
-        return sorted(result)
+        return self._normalize(revision, result)
 
     def schemas(self, revision):
         directory = os.path.join(self.tmpdir, revision, self.schemas_dir)
@@ -127,7 +132,7 @@ class Package:
                                  self.schemas_dir, schema)
         if not os.path.isdir(directory):
             return []
-        return sorted(self._get_files(directory))
+        return self._normalize(revision, self._get_files(directory))
 
     def add(self, revision, skipfiles=None):
         if revision.skiplist_only():

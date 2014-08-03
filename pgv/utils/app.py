@@ -3,6 +3,7 @@ import logging
 import pgv.installer
 import pgv.package
 import pgv.utils.misc
+from pgv.utils.exceptions import PGVUnknownCommand
 from pgv.collector import Collector
 from pgv.initializer import DatabaseInitializer, RepositoryInitializer
 from pgv.viewer import Viewer
@@ -85,5 +86,5 @@ class Application:
     def run(self, command):
         action = "do_%s" % command
         if action not in dir(self):
-            raise AttributeError("Unknown command: %s", command)
+            raise PGVUnknownCommand(command)
         getattr(self, action)()

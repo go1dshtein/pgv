@@ -60,10 +60,10 @@ class TestTracker(unittest.TestCase):
         self.assertEquals(actual, expected)
         self.assertTrue(not result)
 
-    def test_get_revision(self):
+    def test_revision(self):
         revision = "qwerty"
         tracker = pgv.tracker.Tracker(self.connection)
-        tracker.get_revision()
+        tracker.revision()
         actual = self.connection.cursor().__enter__().callproc.mock_calls
         expected = [mock.call("%s.revision" % tracker.schema)]
         self.assertEquals(actual, expected)
@@ -96,33 +96,4 @@ class TestTracker(unittest.TestCase):
         expected = [mock.call("%s.run" % tracker.schema, (filename,)),
                     mock.call("%s.error" % tracker.schema,
                               (run_id, exception))]
-        self.assertEquals(actual, expected)
-
-    def test_revision(self):
-        revision = "qwerty"
-        self.connection.cursor().__enter__().fetchone.return_value = [None]
-        tracker = pgv.tracker.Tracker(self.connection)
-        with tracker.revision(revision):
-            pass
-        actual = self.connection.cursor().__enter__().callproc.mock_calls
-        expected = [mock.call("%s.commit" % tracker.schema, (revision,))]
-        self.assertEquals(actual, expected)
-
-    def test_revision_fail(self):
-        revision = "qwerty"
-        exception = IOError("error")
-        self.connection.cursor().__enter__().fetchone.return_value = [None]
-        tracker = pgv.tracker.Tracker(self.connection)
-
-        result = []
-
-        def check():
-            with tracker.revision(revision):
-                result.append(revision)
-                raise exception
-
-        self.assertRaises(IOError, check)
-        self.assertEquals(result, [revision])
-        actual = self.connection.cursor().__enter__().callproc.mock_calls
-        expected = []
         self.assertEquals(actual, expected)

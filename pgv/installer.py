@@ -2,127 +2,106 @@ import os
 import psycopg2
 import logging
 import pgv.package
+import pgv.tracker
+import pgv.loader
+from pgv.utils.exceptions import PGVIsNotInitialized
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT as AUTOCOMMIT
 
 logger = logging.getLogger(__name__)
 
 
 class Installer:
-    schema = "pgv"
     events = type("E", (object,), pgv.package.Package.events)
 
     def __init__(self, constring, isolation_level=None):
-        logger.debug("connection string: %s", constring)
         if isolation_level is None:
-            isolation_level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
-        logger.debug("isolation level: %s", isolation_level)
+            isolation_level = AUTOCOMMIT
+
         self.connection = psycopg2.connect(constring)
         self.connection.set_isolation_level(isolation_level)
-        if isolation_level != psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT:
-            self.metaconn = psycopg2.connect(constring)
-            self.metaconn.set_isolation_level(
-                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        if isolation_level != AUTOCOMMIT:
+            metaconn = psycopg2.connect(constring)
+            metaconn.set_isolation_level(AUTOCOMMIT)
         else:
-            self.metaconn = self.connection
+            metaconn = self.connection
 
-    def _get_text(self, filename):
-        with open(filename) as h:
-            return h.read()
-
-    def _meta_run(self, filename):
-        with self.metaconn.cursor() as cursor:
-            cursor.callproc("%s.run" % self.schema, (filename,))
-            return cursor.fetchone()[0]
-
-    def _meta_error(self, script_id, message):
-        with self.metaconn.cursor() as cursor:
-            cursor.callproc("%s.error" % self.schema, (script_id, message))
-
-    def _meta_success(self, script_id):
-        with self.metaconn.cursor() as cursor:
-            cursor.callproc("%s.success" % self.schema, (script_id,))
-
-    def _meta_commit(self, revision):
-        with self.metaconn.cursor() as cursor:
-            cursor.callproc("%s.commit" % self.schema, (revision,))
-
-    def _meta_installed(self, revision):
-        with self.metaconn.cursor() as cursor:
-            cursor.callproc("%s.is_installed" % self.schema, (revision,))
-            result = cursor.fetchone()[0]
-            return result is not None
-
-    def _meta_revision(self):
-        with self.metaconn.cursor() as cursor:
-            cursor.callproc("%s.revision" % self.schema)
-            return cursor.fetchone()[0]
+        self.tracker = pgv.tracker.Tracker(metaconn)
+        if not self.tracker.is_initialized():
+            raise PGVIsNotInitialized()
 
     def _run_scripts(self, package, revision, event):
         dirname = os.path.join(package.tmpdir, revision)
-        with self.connection.cursor() as cursor:
-            for filename in package.scripts(revision, event):
-                script = self._get_text(filename)
-                script_id = self._meta_run(filename[len(dirname):].lstrip("/"))
-                try:
-                    logger.debug("run script `%s' on event '%s': \n%s",
-                                 filename, event, script)
-                    logger.info("  > %s", filename[len(dirname):].lstrip("/"))
+        loader = pgv.loader.Loader(dirname)
+        for filename in package.scripts(revision, event):
+            script = loader.load(filename)
+            with self.connection.cursor() as cursor:
+                with self.tracker.script(filename):
+                    logger.info("    run %s", filename)
                     cursor.execute(script)
-                    logger.debug("status: \n%s", cursor.statusmessage)
-                except Exception, e:
-                    self._meta_error(script_id, repr(e))
-                    raise
-                else:
-                    self._meta_success(script_id)
-
-    def _run_schemas(self, package, revision):
-        dirname = os.path.join(package.tmpdir, revision)
-        with self.connection.cursor() as cursor:
-            for schema in sorted(package.schemas(revision)):
-                logger.info("  changing schema %s", schema)
-                try:
-                    self._run_scripts(package, revision, self.events.pre)
-                    for filename in sorted(
-                            package.schema_files(revision, schema)):
-                        try:
-                            script = self._get_text(filename)
-                            logger.debug("run schema script `%s': \n%s",
-                                         filename, script)
-                            logger.info(
-                                "    %s", filename[len(dirname):].lstrip("/"))
-                            cursor.execute(script)
-                            logger.debug("status: \n%s", cursor.statusmessage)
-                        except:
-                            self._run_scripts(package, revision,
-                                              self.events.error)
-                            raise
-                        else:
-                            self._run_scripts(package, revision,
-                                              self.events.success)
-                except:
-                    self._run_scripts(package, revision, self.events.post)
-                    raise
-                else:
-                    self._run_scripts(package, revision, self.events.post)
-                    logger.info("  done")
 
     def install(self, package):
         for revision in package.revlist:
-            if self._meta_installed(revision):
+            if self.tracker.is_installed(revision):
                 logger.debug("revision %s is installed already", revision)
                 continue
-            logger.info("installing revision %s", revision)
-            try:
-                self._run_scripts(package, revision, self.events.start)
-                self._run_schemas(package, revision)
-            except:
-                self._run_scripts(package, revision, self.events.stop)
-                raise
-            else:
-                self._run_scripts(package, revision, self.events.stop)
-                if not self.connection.autocommit:
-                    self.connection.commit()
-                self._meta_commit(revision)
-                logger.info("done\n")
 
-    def get_revision(self):
-        return self._meta_revision()
+            logger.info("installing revision %s", revision)
+            with self.tracker.revision(revision):
+                with self.revision(package, revision):
+                    directory = os.path.join(package.tmpdir, revision)
+                    loader = pgv.loader.Loader(directory)
+                    for schema in package.schemas():
+                        logger.info("  schema %s", schema)
+                        with self.schema(package, revision):
+                            for filename in package.schema_files(schema):
+                                logger.info("    script %s", filename)
+                                script = loader.load(filename)
+                                with self.script(package, revision):
+                                    with self.tracker.script(filename):
+                                        with self.connection.cursor() as c:
+                                            c.execute(script)
+
+            if not self.connection.autocommit:
+                self.connection.commit()
+
+    def revision(self, package, revision):
+        this = self
+
+        class RevisionInstaller:
+            def __enter__(self):
+                this._run_scripts(package, revision, this.events.start)
+
+            def __exit__(self, type, value, tb):
+                this._run_scripts(package, revision, this.events.stop)
+                return type is None
+
+        return RevisionInstaller()
+
+    def schema(self, package, revision):
+        this = self
+
+        class SchemaInstaller:
+            def __enter__(self):
+                this._run_scripts(package, revision, this.events.pre)
+
+            def __exit__(self, type, value, tb):
+                this._run_scripts(package, revision, this.events.post)
+                return type is None
+
+        return SchemaInstaller()
+
+    def script(self, package, revision):
+        this = self
+
+        class ScriptInstaller:
+            def __enter__(self):
+                pass
+
+            def __exit__(self, type, value, tb):
+                if type is None:
+                    this._run_scripts(package, revision, this.events.success)
+                else:
+                    this._run_scripts(package, revision, this.events.error)
+                return type is None
+
+        return ScriptInstaller()

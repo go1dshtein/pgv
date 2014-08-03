@@ -30,6 +30,16 @@ class Tracker:
             result = cursor.fetchone()[0]
             return result is not None
 
+    def is_initialized(self):
+        query = """
+            select count(*)
+              from pg_catalog.pg_namespace n
+             where n.nspname = %s"""
+        with self.connection.cursor() as cursor:
+            cursor.execute(query, (self.schema,))
+            count = cursor.fetchone()[0]
+        return count > 0
+
     def script(self, filename):
         this = self
 
@@ -47,22 +57,7 @@ class Tracker:
 
         return ScriptTracker()
 
-    def revision(self, revision, **kwargs):
-        this = self
-
-        class RevisionTracker:
-            def __enter__(self):
-                pass
-
-            def __exit__(self, type, value, tb):
-                if type is None:
-                    this._commit(revision)
-                    return True
-                return False
-
-        return RevisionTracker()
-
-    def get_revision(self):
+    def revision(self):
         with self.connection.cursor() as cursor:
             cursor.callproc("%s.revision" % self.schema)
             return cursor.fetchone()[0]

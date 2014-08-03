@@ -6,6 +6,7 @@ import pgv.config
 import pgv.utils.options
 import pgv.utils.misc
 import pgv.utils.app
+from pgv.utils.exceptions import PGVError
 
 
 def main():
@@ -17,6 +18,10 @@ def main():
     logger.debug("arguments: %s", " ".join(sys.argv))
     try:
         pgv.utils.app.Application(config, options).run(options.command)
+    except PGVError, e:
+        logger.error(e.message)
+        logger.debug("finish unsuccessfully\n\n")
+        os._exit(e.code)
     except Exception, e:
         logger.exception(e)
         logger.debug("finish unsuccessfully\n\n")

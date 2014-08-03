@@ -1,7 +1,12 @@
+import os
 import mock
 import unittest
 import psycopg2
+import tempfile
+import shutil
 import pgv.initializer
+import pgv.tracker
+import pgv.config
 
 
 class TestDatabaseInitializer(unittest.TestCase):
@@ -14,7 +19,7 @@ class TestDatabaseInitializer(unittest.TestCase):
             select count(*)
               from pg_catalog.pg_namespace n
              where n.nspname = %s"""
-        self.schema = pgv.initializer.DatabaseInitializer.schema
+        self.schema = pgv.tracker.Tracker.schema
         with open(pgv.initializer.DatabaseInitializer.init_script, "r") as h:
             self.script = h.read()
 
@@ -64,3 +69,55 @@ class TestDatabaseInitializer(unittest.TestCase):
         expected_proc = [mock.call('pgv.commit', ("0",)),
                          mock.call('pgv.commit', ("1",))]
         self.assertEquals(actual_proc, expected_proc)
+
+
+class TestRepositoryInitializer(unittest.TestCase):
+    def setUp(self):
+        self.current = os.getcwd()
+        self.tmpdir = tempfile.mkdtemp()
+        os.chdir(self.tmpdir)
+
+    def test_initialize(self):
+        expected = """vcs:
+  prefix: ''
+"""
+        initializer = pgv.initializer.RepositoryInitializer()
+        initializer.initialize()
+        files = os.listdir(self.tmpdir)
+        self.assertEquals(
+            set(files), set([pgv.config.name, "schemas", "scripts"]))
+        with open(pgv.config.name) as h:
+            config = h.read()
+        self.assertEquals(config, expected)
+
+    def test_initialize_with_prefix(self):
+        prefix = "qwerty"
+        expected = """vcs:
+  prefix: %s
+""" % prefix
+        initializer = pgv.initializer.RepositoryInitializer()
+        initializer.initialize(prefix)
+        files = os.listdir(self.tmpdir)
+        self.assertEquals(set(files), set([pgv.config.name, prefix]))
+        files = os.listdir(os.path.join(self.tmpdir, prefix))
+        self.assertEquals(set(files), set(["schemas", "scripts"]))
+        with open(pgv.config.name) as h:
+            config = h.read()
+        self.assertEquals(config, expected)
+
+    def test_initialize_config_exists(self):
+        expected = "qwerty"
+        with open(pgv.config.name, "w") as h:
+            h.write(expected)
+        initializer = pgv.initializer.RepositoryInitializer()
+        initializer.initialize()
+        files = os.listdir(self.tmpdir)
+        self.assertEquals(set(files), set([pgv.config.name]))
+        with open(pgv.config.name) as h:
+            config = h.read()
+        self.assertEquals(config, expected)
+
+    def tearDown(self):
+        os.chdir(self.current)
+        if os.path.exists(self.tmpdir):
+            shutil.rmtree(self.tmpdir)
