@@ -126,7 +126,7 @@ class TestVSCGit(unittest.TestCase):
                            include=("schemas/*/types/*.sql",))
         hash1 = "edf79e098b6321ffa118085fcb2b5776953a314b"
         rev = repo.revision(hash1)
-        self.assertFalse(rev.skiplist_only())
+        self.assertTrue(rev.skiplist_only())
         hash2 = "0c0cf8b1f385af6f991a127cfd5ac2272b95d459"
         rev = repo.revision(hash2)
         self.assertFalse(rev.skiplist_only())

@@ -10,7 +10,7 @@ import shutil
 from git import *
 import git.repo.fun
 
-import pgv.skiplist
+from pgv.skiplist import SkipList
 import pgv.vcs
 
 
@@ -67,6 +67,13 @@ class GitRevision(pgv.vcs.Revision):
         else:
             files = set(files) & set(self.files())
         return self.provider()._export(dest, files, self.hash())
+
+    def skiplist_only(self):
+        files = filter(self._filter_files,
+                       self._gitcommit.stats.files.viewitems())
+        files = map(lambda x: x[len(self.provider().prefix):].lstrip('/'),
+                    dict(files).viewkeys())
+        return files == [SkipList.name]
 
 
 class Git:

@@ -35,8 +35,7 @@ class Revision:
         raise NotImplementedError()
 
     def skiplist_only(self):
-        print self.change().files()
-        return list(self.change().files()) == [SkipList.name]
+        raise NotImplementedError()
 
 
 class Change:
