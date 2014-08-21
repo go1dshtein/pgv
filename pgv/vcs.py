@@ -1,5 +1,4 @@
 import pgv.vcs_provider
-from pgv.skiplist import SkipList
 import importlib
 import logging
 import itertools
