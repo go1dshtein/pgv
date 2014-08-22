@@ -1,0 +1,16 @@
+vcs:
+  provider: git
+  url: file://$PWD
+  prefix: tests/data/sql
+  include:
+    - "schemas/*/types/*.sql"
+database:
+  isolation_level: autocommit
+package:
+  format: directory
+  path: $PWD/dist/pgv
+logging:
+  level: DEBUG
+  filename: $PWD/build/pgv.log
+  bytes: 1000000
+  count: 2
