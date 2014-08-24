@@ -63,7 +63,7 @@ class Package:
             return "tar.gz"
         elif path.endswith(".tar.bz2"):
             return "tar.bz2"
-        elif pat.endswith(".zip"):
+        elif path.endswith(".zip"):
             raise NotImplemented("Zip format is unsupported yet")
         else:
             return "directory"

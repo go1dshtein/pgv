@@ -39,7 +39,7 @@ class Application:
         if self.options.dbname and not self.options.from_rev:
             connection = pgv.utils.misc.get_connection_string(self.options)
             installer = Installer(connection)
-            from_rev = installer.get_revision()
+            from_rev = installer.tracker.revision()
         else:
             from_rev = self.options.from_rev
 
@@ -65,7 +65,7 @@ class Application:
 
         path = self.options.input or self.config.package.path
         if not self.options.collect:
-            package.load(path)
+            package.load(path, self.options.format)
         installer.install(package)
 
     def do_skip(self):
@@ -80,8 +80,8 @@ class Application:
             viewer.show_skipped(self.options.to_rev)
         else:
             viewer.show(self.options.with_skipped,
-                        from_rev=self.options.from_rev,
-                        to_rev=self.options.to_rev)
+                        self.options.from_rev,
+                        self.options.to_rev)
 
     def run(self, command):
         action = "do_%s" % command
