@@ -96,7 +96,7 @@ Supported variables are:
 :       currently applying schema filename, if available;
 
 #FILES
-By default *pgv* searches for *.pgv*
+By default *pgv* searches for *pgv.yaml*
 configuration file in current and parent directories recursively.
 This file describes location of directory with SQL files,
 type of generated package, permanently included files and logging.

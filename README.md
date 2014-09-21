@@ -23,28 +23,28 @@ First of all, you need to initialize repository:
 	~:    user$ cd repo
 	repo: user$ pgv init -p db
 
-This command creates simple **pgv** config **.pgv** in working directory and folder **db**:
+This command creates simple **pgv** config **pgv.yaml** in working directory and folder **db**:
 
-*   db
-* *     schemas
-* *     scripts
+    db/
+      schemas/
+      scripts/
 
 According to the convention **schemas** subfolder should contains folders named after desired schemas in database.
 Files inside these directories should be the SQL scripts, that describes corresponding schema.
 E.g. you want to create table **foo** and function **bar** in schema **public**:
 
-*    schemas
-* *     public
-* * *      tables
-* * * *     foo.sql
-* * *      functions
-* * * *     bar.sql
+    schemas/
+      public/
+        tables/
+          foo.sql
+        functions/
+          bar.sql
 
 **Scripts** subfolder should contains some staff scripts: data fixes, migrations and so on. SQL files in this folder can contains prefix
 that defines the position on execution flow. E.g. you need to add script that grants access to all objects in the database. It should be executed after all other.
 
-*   scripts
-* *   grants_post.sql
+    scripts/
+      grants_post.sql
 
 More details about **schemas** and **scripts** see in [pgv.1](https://github.com/go1dshtein/pgv/blob/master/docs/pgv.1.md).
 
@@ -86,7 +86,7 @@ After fix you want to push changes to **production**, but database allows only l
 
 [**pgv init**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-init.1.md) - initializes repository in the current directory.
 
-[**pgv initdb**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-inidb.1.md) - initializes new database for working with **pgv**.
+[**pgv initdb**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-initdb.1.md) - initializes new database for working with **pgv**.
 
 [**pgv collect**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-collect.1.md) - collects changes into package.
 
