@@ -47,7 +47,7 @@ Information of applied changes will be stored to schema *pgv* of target database
 :       print help and exit;
 
 -c *CONFIG* --config *CONFIG*
-:       use *CONFIG* instead of VCS repository wide *.pgv* configuration file.
+:       use *CONFIG* instead of VCS repository wide *pgv.yaml* configuration file.
 
 #CODE STRUCTURE
 *pgv* divide all sql file into two folders - schemas and scripts.
@@ -100,11 +100,11 @@ By default *pgv* searches for *pgv.yaml*
 configuration file in current and parent directories recursively.
 This file describes location of directory with SQL files,
 type of generated package, permanently included files and logging.
-More info about configuration file see in `pgv-config (5)`.
+More info about configuration file see in `pgv (5)`.
 
 <!---
 #SEE ALSO
-`pgv-config (5)`
+`pgv (5)`
 `pgv-init (1)`
 `pgv-collect (1)`
 `pgv-push (1)`
