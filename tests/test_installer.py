@@ -17,6 +17,7 @@ class TestInstaller(unittest.TestCase):
         pgv.installer.Tracker = self.tracker
         pgv.installer.psycopg2.connect = lambda x: mock.MagicMock()
         self.connstr = "TEST "
+        self.maxDiff = None
 
     def test_init(self):
         self.tracker().is_initialized.return_value = True
@@ -55,6 +56,8 @@ class TestInstaller(unittest.TestCase):
         expected = [
             mock.call('scripts/test1_start.sql'),
             mock.call('scripts/test2_pre.sql'),
+            mock.call('schemas/private/functions/subs.sql'),
+            mock.call('scripts/test4_success.sql'),
             mock.call('schemas/private/functions/test.sql'),
             mock.call('scripts/test4_success.sql'),
             mock.call('schemas/private/functions/test2.sql'),
@@ -72,6 +75,7 @@ class TestInstaller(unittest.TestCase):
         self.assertEquals(kwargs["schemas"], ["private", "public"])
         self.assertEquals(
             set(kwargs["files"]), set([
+                'schemas/private/functions/subs.sql',
                 'schemas/private/functions/test.sql',
                 'schemas/private/functions/test2.sql',
                 'schemas/public/types/data.sql']))
@@ -94,7 +98,7 @@ class TestInstaller(unittest.TestCase):
 
         exception = type("E", (Exception,), {})
 
-        def side(value):
+        def side(value, kwargs=None):
             if value.startswith("create"):
                 raise exception()
             return mock.DEFAULT
@@ -106,6 +110,8 @@ class TestInstaller(unittest.TestCase):
         expected = [
             mock.call('scripts/test1_start.sql'),
             mock.call('scripts/test2_pre.sql'),
+            mock.call('schemas/private/functions/subs.sql'),
+            mock.call('scripts/test4_success.sql'),
             mock.call('schemas/private/functions/test.sql'),
             mock.call('scripts/test5_error.sql'),
             mock.call('scripts/testdir/test7_error.sql'),
@@ -114,6 +120,38 @@ class TestInstaller(unittest.TestCase):
             mock.call('scripts/test6_stop.sql')]
         self.assertEquals(actual, expected)
         self.assertEqual(self.tracker().commit.call_count, 0)
+
+    def test_substitution_args(self):
+        self.tracker().is_initialized.return_value = True
+        self.tracker().is_installed.return_value = False
+        installer = pgv.installer.Installer(
+            self.connstr, pgv.installer.AUTOCOMMIT + 1)
+
+        actual = []
+        expected = [
+            {'revision': 'sql'},
+            {'revision': 'sql', 'schema': 'private'},
+            {'filename': 'schemas/private/functions/subs.sql',
+             'revision': 'sql', 'schema': 'private'},
+            {'filename': 'schemas/private/functions/test.sql',
+             'revision': 'sql', 'schema': 'private'},
+            {'filename': 'schemas/private/functions/test2.sql',
+             'revision': 'sql', 'schema': 'private'},
+            {'revision': 'sql', 'schema': 'private'},
+            {'revision': 'sql', 'schema': 'public'},
+            {'filename': 'schemas/public/types/data.sql',
+             'revision': 'sql', 'schema': 'public'},
+            {'revision': 'sql', 'schema': 'public'},
+            {'revision': 'sql'},
+            {'revision': 'sql'}]
+
+        def side(value, kwargs=None):
+            actual.append(kwargs)
+            return mock.DEFAULT
+
+        installer.connection.cursor().__enter__().execute.side_effect = side
+        installer.install(self.package)
+        self.assertEqual(filter(lambda x: x is not None, actual), expected)
 
     def tearDown(self):
         del self.package

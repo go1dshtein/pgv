@@ -30,7 +30,8 @@ class Installer:
         if not self.tracker.is_initialized():
             raise PGVIsNotInitialized()
 
-    def _run_scripts(self, package, revision, event):
+    def _run_scripts(self, package, revision, event, **kwargs):
+        kwargs["revision"] = revision
         dirname = os.path.join(package.tmpdir, revision)
         loader = pgv.loader.Loader(dirname)
         for filename in package.scripts(revision, event):
@@ -38,7 +39,7 @@ class Installer:
             with self.connection.cursor() as cursor:
                 with self.tracker.script(filename):
                     logger.info("    run %s", filename)
-                    cursor.execute(script)
+                    cursor.execute(script, kwargs)
 
     def install(self, package):
         for revision in package.revlist:
@@ -52,11 +53,12 @@ class Installer:
                 loader = pgv.loader.Loader(directory)
                 for schema in package.schemas(revision):
                     logger.info("  schema %s", schema)
-                    with self.schema(package, revision):
+                    with self.schema(package, revision, schema):
                         for filename in package.schema_files(revision, schema):
                             logger.info("    script %s", filename)
                             script = loader.load(filename)
-                            with self.script(package, revision):
+                            with self.script(package, revision, schema,
+                                             filename):
                                 with self.tracker.script(filename):
                                     with self.connection.cursor() as c:
                                         c.execute(script)
@@ -88,20 +90,22 @@ class Installer:
 
         return RevisionInstaller()
 
-    def schema(self, package, revision):
+    def schema(self, package, revision, schema):
         this = self
 
         class SchemaInstaller:
             def __enter__(self):
-                this._run_scripts(package, revision, this.events.pre)
+                this._run_scripts(package, revision, this.events.pre,
+                                  schema=schema)
 
             def __exit__(self, type, value, tb):
-                this._run_scripts(package, revision, this.events.post)
+                this._run_scripts(package, revision, this.events.post,
+                                  schema=schema)
                 return type is None
 
         return SchemaInstaller()
 
-    def script(self, package, revision):
+    def script(self, package, revision, schema, filename):
         this = self
 
         class ScriptInstaller:
@@ -110,9 +114,11 @@ class Installer:
 
             def __exit__(self, type, value, tb):
                 if type is None:
-                    this._run_scripts(package, revision, this.events.success)
+                    this._run_scripts(package, revision, this.events.success,
+                                      schema=schema, filename=filename)
                 else:
-                    this._run_scripts(package, revision, this.events.error)
+                    this._run_scripts(package, revision, this.events.error,
+                                      schema=schema, filename=filename)
                 return type is None
 
         return ScriptInstaller()
