@@ -81,8 +81,12 @@ After fix you want to push changes to **production**, but database allows only l
 	repo: user$ ssh prod
 	~:    user@prod$ pgv push -i /tmp/changes-to-prod.tar.gz -d prod
 
+###Documentation
 
-###Subcommands
+[**pgv**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv.1.md)  and 
+[**pgv-config**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv.5.md)
+
+####Subcommands
 
 [**pgv init**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-init.1.md) - initializes repository in the current directory.
 
@@ -95,3 +99,9 @@ After fix you want to push changes to **production**, but database allows only l
 [**pgv show**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-show.1.md) - shows revisions in the repository.
 
 [**pgv skip**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv-skip.1.md) - skips some changes from collecting to package.
+
+### Tests
+
+To run test use:
+	
+	tox
