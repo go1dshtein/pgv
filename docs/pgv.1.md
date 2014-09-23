@@ -4,13 +4,13 @@
 %July, 2014
 -->
 
-#NAME
+###NAME
 pgv - PostgreSQL schema versioning tool.
 
-#SYNOPSYS
+###SYNOPSYS
 **pgv** [--help] [-c *CONFIG*] *COMMAND*
 
-#DESCRIPTION
+###DESCRIPTION
 **pgv** is schema versioning tool for PostgreSQL.
 
 It helps to support database schemas in VCS repository and push changes into
@@ -22,7 +22,7 @@ directory structure. See [CODE STRUCTURE](#code-structure) below for further det
 
 Information of applied changes will be stored to schema *pgv* of target database.
 
-#COMMANDS
+###COMMANDS
 **init**
 :       initializes repository in the current directory;
 
@@ -42,14 +42,14 @@ Information of applied changes will be stored to schema *pgv* of target database
 **show**
 :       shows information about revisions in repository and database.
 
-#OPTIONS
+###OPTIONS
 --help
 :       print help and exit;
 
 -c *CONFIG* --config *CONFIG*
 :       use *CONFIG* instead of VCS repository wide *pgv.yaml* configuration file.
 
-#CODE STRUCTURE
+###CODE STRUCTURE
 *pgv* divide all sql file into two folders - schemas and scripts.
 Schemas folder containes subfolders named after desired schemas, e.g.: public.
 It contains sql files which defines schema - tables, views, types, functions etc.
@@ -95,7 +95,7 @@ Supported variables are:
 **filename**
 :       currently applying schema filename, if available;
 
-#FILES
+###FILES
 By default *pgv* searches for *pgv.yaml*
 configuration file in current and parent directories recursively.
 This file describes location of directory with SQL files,
