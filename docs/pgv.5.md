@@ -5,13 +5,15 @@
 -->
 
 ###NAME
-pgv - PostgreSQL schema versioning tool configuration file.
+pgv.yaml - PostgreSQL schema versioning tool configuration file.
 
 ###DESCRIPTION
-**pgv** is schema versioning tool for PostgreSQL.
+**pgv** is schema versioning tool for PostgreSQL. 
+It is best if **pgv.yaml** is located in top of project repository.
+File can contains sections and options described below, otherwise default values will be used.
 
 ###VCS
-This section describes version control system(e.g.: git, hg, ...) that you want to use.
+This section describes version control system(e.g.: *git*, *hg*, ...) that you want to use.
 Key **provider** defines type of vcs, by default it is git.
 Other keys are provider dependant.
 If option **url** is not defined then working directory will be used.
@@ -45,9 +47,14 @@ This section setup default package **format** and **path**.
 **tar.bz2**
 :	bzipped tar archive.
 
+If **format** is not specified then it will computed from **path** by extension.
+Default *path* is **$PWD/.pgv/dist.tar.gz**.
+
 ###LOGGING
 
-
+**level** and **filename** - names speak for themselves. 
+*INFO* and *$PWD/.pgv/pgv.log* by default respectively. 
+**bytes** and **count** describes log rotating(1000000 and 4 by default).
 <!---
 #SEE ALSO
 `pgv (1)`
