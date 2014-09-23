@@ -4,33 +4,35 @@
 %July, 2014
 -->
 
-#NAME
+###NAME
 pgv - PostgreSQL schema versioning tool configuration file.
 
-#DESCRIPTION
+###DESCRIPTION
 **pgv** is schema versioning tool for PostgreSQL.
 
-#VCS
+###VCS
 This section describes version control system(e.g.: git, hg, ...) that you want to use.
-Key *provider* defines type of vcs, by default it is git.
+Key **provider** defines type of vcs, by default it is git.
 Other keys are provider dependant.
-If option *url* is not defined then working directory will be used.
-*Prefix* is prefix of target files relatively to *url*.
-*Include* can be contains list of patterns.
+If option **url** is not defined then working directory will be used.
+**prefix** is prefix of target files relatively to **url**.
+**include** can be contains list of patterns.
 All matching files will be added to revision even it does not changed.
 
-#DATABASE
-*Isolation_level* describes transaction isolation level(autocommit by default).
+###DATABASE
+**isolation_level** describes transaction isolation level(autocommit by default).
 It can be on of:
 * autocommit
 * read_commited
 * repeatable_read
 * serializable
+
 See [psycopg2](http://initd.org/psycopg/docs/extensions.html#isolation-level-constants) for details.
 
-#PACKAGE
-This section setup default package *format* and *path*.
-*Format* can be:
+###PACKAGE
+This section setup default package **format** and **path**.
+**format** can be:
+
 **directory**
 :	simple directory with sql files.
 
@@ -43,7 +45,7 @@ This section setup default package *format* and *path*.
 **tar.bz2**
 :	bzipped tar archive.
 
-#LOGGING
+###LOGGING
 
 
 <!---
