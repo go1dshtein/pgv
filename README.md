@@ -1,5 +1,6 @@
+
 ##PostgreSQL Schema Versioning Tool
-**pgv** is an open source utility that makes available to support PostgreSQL schemas in a VCS repository. 
+**pgv** is an open source utility that makes available to support PostgreSQL schemas in a VCS repository.
 
 
 ###Overview
@@ -51,11 +52,11 @@ More details about **schemas** and **scripts** see in [pgv.1](https://github.com
 Ok, you want to apply committed changes to database. Let's initialize it:
 
 	repo: user$ pgv initdb -d test
-	
+
 Than push changes to database **test**:
 
 	repo: user$ pgv push -c -d test
-	
+
 E.g. you've made some checks on **test** database and you've understood that function **bar** is not needed. Let's skip it:
 
 	repo: user$ pgv show
@@ -69,7 +70,7 @@ E.g. you've made some checks on **test** database and you've understood that fun
     repo: user$ pgv show
     cdfdbfb2bdcf8ee2dbf190bbf3a73ffbd77bd9b3 [s]
       .skiplist
-      
+
     c2d658898d4a1369c20285464bd5bb95713173f6
       schemas/public/tables/foo.sql
 	  scripts/grants_post.sql
@@ -83,7 +84,7 @@ After fix you want to push changes to **production**, but database allows only l
 
 ###Documentation
 
-[**pgv**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv.1.md)  and 
+[**pgv**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv.1.md)  and
 [**pgv-config**](https://github.com/go1dshtein/pgv/blob/master/docs/pgv.5.md)
 
 ####Subcommands
@@ -103,5 +104,5 @@ After fix you want to push changes to **production**, but database allows only l
 ### Tests
 
 To run test use:
-	
+
 	tox
