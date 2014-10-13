@@ -1,0 +1,106 @@
+.TH "pgv\-collect" "1" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv collect \- collects changes into package.
+.SH SYNOPSYS
+.PP
+\f[B]pgv collect\f[] [\-\-help]
+.PP
+\f[B]pgv collect\f[] [\-f \f[I]REVISION\f[]] [\-t \f[I]REVISION\f[]]
+[\-o \f[I]PATH\f[]] [\-F \f[I]FORMAT\f[]]
+.PP
+\f[B]pgv collect\f[] \-d \f[I]DBNAME\f[] [\-h \f[I]HOST\f[]] [\-p
+\f[I]PORT\f[]] [\-U \f[I]USERNAME\f[]] [\-w|\-W] [\-o \f[I]PATH\f[]]
+[\-F \f[I]FORMAT\f[]]
+.SH DESCRIPTION
+.PP
+\f[B]pgv collect\f[] collects changes to package which one can be pushed
+to database.
+.PP
+If \f[I]DBNAME\f[] is defined then \f[I]pgv\f[] gets miniman
+revision(\f[I]\-\-from\f[] analogue) from database.
+.SH OPTIONS
+.TP
+.B \-\-help
+print help and exit;
+.RS
+.RE
+.TP
+.B \-o \f[I]PATH\f[] \-\-output \f[I]PATH\f[]
+path to package;
+.RS
+.RE
+.TP
+.B \-F \f[I]FORMAT\f[] \-\-format \f[I]FORMAT\f[]
+format of package;
+.RS
+.RE
+.TP
+.B \-f \f[I]REVISION\f[] \-\-from \f[I]REVISION\f[]
+no collect changes older then \f[I]REVISION\f[];
+.RS
+.RE
+.TP
+.B \-t \f[I]REVISION\f[] \-\-to \f[I]REVISION\f[]
+no collect changes newer then \f[I]REVISION\f[].
+.RS
+.RE
+.SH CONNECTION OPTIONS
+.TP
+.B \-d \f[I]DBNAME\f[] \-\-dbname \f[I]DBNAME\f[]
+name of target database;
+.RS
+.RE
+.TP
+.B \-h \f[I]HOST\f[] \-\-host \f[I]HOST\f[]
+database server address;
+.RS
+.RE
+.TP
+.B \-p \f[I]PORT\f[] \-\-port \f[I]PORT\f[]
+database port;
+.RS
+.RE
+.TP
+.B \-U \f[I]USERNAME\f[] \-\-username \f[I]USERNAME\f[]
+database username;
+.RS
+.RE
+.TP
+.B \-w \-\-no\-password
+no ask for password;
+.RS
+.RE
+.TP
+.B \-W \-\-password
+ask for password.
+.RS
+.RE
+.SH EXAMPLES
+.PP
+If you want to collect changes into the package on default path:
+.IP
+.nf
+\f[C]
+pgv\ collect
+\f[]
+.fi
+.PP
+You can skip psuhed changes:
+.IP
+.nf
+\f[C]
+pgv\ collect\ \-d\ mydb\ \-h\ test\ \-U\ test
+\f[]
+.fi
+.PP
+And you can specify set of changes to collect:
+.IP
+.nf
+\f[C]
+pgv\ collect\ \-f\ <revision>\ \-t\ <revision>
+\f[]
+.fi
+.SH SEE ALSO
+.PP
+\f[C]pgv(1)\f[]

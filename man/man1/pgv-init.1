@@ -1,0 +1,38 @@
+.TH "pgv\-init" "1" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv init \- initializes repository in the current directory.
+.SH SYNOPSYS
+.PP
+\f[B]pgv init\f[] \-\-help
+.PP
+\f[B]pgv init\f[] [\-p \f[I]PATH\f[]]
+.SH DESCRIPTION
+.PP
+\f[B]pgv init\f[] prepare working directory.
+It creates schemas directory with right structure and minimal
+configuration file in the current directory.
+.SH OPTIONS
+.TP
+.B \-\-help
+print help and exit;
+.RS
+.RE
+.TP
+.B \-p \f[I]PATH\f[] \-\-prefix \f[I]PATH\f[]
+relative path to schemas base directory.
+.RS
+.RE
+.SH EXAMPLES
+.PP
+You start new project and want to store database schema in
+"./database/sql" folder:
+.IP
+.nf
+\f[C]
+pgv\ init\ \-p\ database/sql
+\f[]
+.fi
+.SH SEE ALSO
+.PP
+\f[C]pgv(1)\f[]

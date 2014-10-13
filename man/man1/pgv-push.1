@@ -1,0 +1,88 @@
+.TH "pgv\-init" "1" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv push \- applies changes to target database.
+.SH SYNOPSYS
+.PP
+\f[B]pgv push\f[] \-\-help
+.PP
+\f[B]pgv push\f[] [\-c] \-d \f[I]DBNAME\f[] [\-h \f[I]HOST\f[]] [\-U
+\f[I]USERNAME\f[]] [\-w|\-W] [\-i \f[I]PATH\f[]] [\-F \f[I]FORMAT\f[]]
+.SH DESCRIPTION
+.PP
+\f[B]pgv push\f[] reads package with changes and executes SQL scripts
+from it on database.
+.SH OPTIONS
+.TP
+.B \-\-help
+print help and exit;
+.RS
+.RE
+.TP
+.B \-c \-\-collect
+collect changes to package, alias to
+\f[C]pgv\ collect\ &&\ pgv\ push\f[]
+.RS
+.RE
+.TP
+.B \-i \f[I]PATH\f[] \-\-input \f[I]PATH\f[]
+path to package;
+.RS
+.RE
+.TP
+.B \-F \f[I]FORMAT\f[] \-\-format \f[I]FORMAT\f[]
+format of package;
+.RS
+.RE
+.SH CONNECTION OPTIONS
+.TP
+.B \-d \f[I]DBNAME\f[] \-\-dbname \f[I]DBNAME\f[]
+name of target database;
+.RS
+.RE
+.TP
+.B \-h \f[I]HOST\f[] \-\-host \f[I]HOST\f[]
+database server address;
+.RS
+.RE
+.TP
+.B \-p \f[I]PORT\f[] \-\-port \f[I]PORT\f[]
+database port;
+.RS
+.RE
+.TP
+.B \-U \f[I]USERNAME\f[] \-\-username \f[I]USERNAME\f[]
+database username;
+.RS
+.RE
+.TP
+.B \-w \-\-no\-password
+no ask for password;
+.RS
+.RE
+.TP
+.B \-W \-\-password
+ask for password.
+.RS
+.RE
+.SH EXAMPLES
+.PP
+For example, you have collected package and want to push it to database
+\f[I]test\f[]:
+.IP
+.nf
+\f[C]
+pgv\ push\ \-d\ test
+\f[]
+.fi
+.PP
+If you want to push changes from another package:
+.IP
+.nf
+\f[C]
+pgv\ push\ \-d\ test\ \-i\ path/to/package.tar.gz
+\f[]
+.fi
+.SH SEE ALSO
+.PP
+\f[C]pgv\ (1)\f[]

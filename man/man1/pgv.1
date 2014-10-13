@@ -1,0 +1,227 @@
+.TH "pgv" "1" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv \- PostgreSQL schema versioning tool.
+.SH SYNOPSYS
+.PP
+\f[B]pgv\f[] [\-\-help] [\-c \f[I]CONFIG\f[]] \f[I]COMMAND\f[]
+.SH DESCRIPTION
+.PP
+\f[B]pgv\f[] is schema versioning tool for PostgreSQL.
+.PP
+It helps to support database schemas in VCS repository and push changes
+into database as needed \- revision by revision.
+Revision is native revision of your VCS, so no mappings are needed.
+.PP
+All information about files which you need to apply to database should
+be stored in specific directory structure.
+See CODE STRUCTURE (#code-structure) below for further details.
+.PP
+Information of applied changes will be stored to schema \f[I]pgv\f[] of
+target database.
+.SH COMMANDS
+.TP
+.B \f[B]init\f[]
+.IP
+.nf
+\f[C]
+initializes\ repository\ in\ the\ current\ directory;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]initdb\f[]
+.IP
+.nf
+\f[C]
+initializes\ new\ database\ for\ working\ with\ *pgv*;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]collect\f[]
+.IP
+.nf
+\f[C]
+collect\ changes\ into\ package;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]push\f[]
+.IP
+.nf
+\f[C]
+applies\ changes\ to\ target\ database;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]skip\f[]
+.IP
+.nf
+\f[C]
+marks\ specified\ revisions(whole\ or\ some\ files)\ for\ skip\ in\ collecting;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]show\f[]
+.IP
+.nf
+\f[C]
+shows\ information\ about\ revisions\ in\ repository\ and\ database.
+\f[]
+.fi
+.RS
+.RE
+.SH OPTIONS
+.TP
+.B \-\-help
+.IP
+.nf
+\f[C]
+print\ help\ and\ exit;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \-c \f[I]CONFIG\f[] \-\-config \f[I]CONFIG\f[]
+.IP
+.nf
+\f[C]
+use\ *CONFIG*\ instead\ of\ VCS\ repository\ wide\ *pgv.yaml*\ configuration\ file.
+\f[]
+.fi
+.RS
+.RE
+.SH CODE STRUCTURE
+.PP
+\f[I]pgv\f[] divide all sql file into two folders \- schemas and
+scripts.
+Schemas folder containes subfolders named after desired schemas, e.g.:
+public.
+It contains sql files which defines schema \- tables, views, types,
+functions etc.
+.PP
+Scripts folder contains staff sql procedures like creating users,
+grants, data fixes etc.
+It has specific names, like _.sql.
+.PP
+Event defines the place in flow when script should be applied:
+.TP
+.B \f[B]start\f[]
+.IP
+.nf
+\f[C]
+before\ all\ other,\ once\ per\ revision;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]stop\f[]
+.IP
+.nf
+\f[C]
+after\ all\ other,\ once\ per\ revision;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]pre\f[]
+.IP
+.nf
+\f[C]
+before\ applying\ schema,\ once\ per\ schema;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]post\f[]
+.IP
+.nf
+\f[C]
+after\ applying\ schema,\ once\ per\ schema;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]success\f[]
+.IP
+.nf
+\f[C]
+after\ successfully\ finished\ schema\ script;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]error\f[]
+.IP
+.nf
+\f[C]
+after\ unsuccessfully\ finished\ schema\ script.
+\f[]
+.fi
+.RS
+.RE
+.PP
+If scripts does not ends with \f[I]event\f[] then it will never be
+applied.
+But it can be included to another script using \f[I]\\i\f[] or
+\f[I]\\ir\f[] directive.
+.PP
+Scripts can contains placeholders like \f[I]%(variable)s\f[] for
+variables.
+Supported variables are:
+.TP
+.B \f[B]revision\f[]
+.IP
+.nf
+\f[C]
+currently\ applying\ revision;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]schema\f[]
+.IP
+.nf
+\f[C]
+currently\ applying\ schema,\ if\ available;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[B]filename\f[]
+.IP
+.nf
+\f[C]
+currently\ applying\ schema\ filename,\ if\ available;
+\f[]
+.fi
+.RS
+.RE
+.SH FILES
+.PP
+By default \f[I]pgv\f[] searches for \f[I]pgv.yaml\f[] configuration
+file in current and parent directories recursively.
+This file describes location of directory with SQL files, type of
+generated package, permanently included files and logging.
+More info about configuration file see in \f[C]pgv\ (5)\f[].
+.SH SEE ALSO
+.PP
+\f[C]pgv\ (5)\f[] \f[C]pgv\-init\ (1)\f[] \f[C]pgv\-collect\ (1)\f[]
+\f[C]pgv\-push\ (1)\f[] \f[C]pgv\-skip\ (1)\f[] \f[C]pgv\-show\ (1)\f[]

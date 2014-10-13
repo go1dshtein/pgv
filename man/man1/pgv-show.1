@@ -1,0 +1,68 @@
+.TH "pgv\-show" "1" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv show \- shows revisions in the repository.
+.SH SYNOPSYS
+.PP
+\f[B]pgv show\f[] \-\-help
+.PP
+\f[B]pgv show\f[] [\-s|\-w] [\-f REVISION] [\-t REVISION]
+.SH OPTIONS
+.TP
+.B \-s \-\-skipped
+.IP
+.nf
+\f[C]
+shows\ only\ skipped\ changes;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \-w \-\-with\-skipped
+.IP
+.nf
+\f[C]
+shows\ skipped\ changes;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \-f \f[I]REVISION\f[] \-\-from \f[I]REVISION\f[]
+no collect changes older then \f[I]REVISION\f[];
+.RS
+.RE
+.TP
+.B \-t \f[I]REVISION\f[] \-\-to \f[I]REVISION\f[]
+no collect changes newer then \f[I]REVISION\f[].
+.RS
+.RE
+.SH EXAMPLES
+.PP
+You can see changes that will be collected:
+.IP
+.nf
+\f[C]
+pgv\ show
+\f[]
+.fi
+.PP
+If you want to see what changes are skipped:
+.IP
+.nf
+\f[C]
+pgv\ show\ \-s
+\f[]
+.fi
+.PP
+Or you can see all changes:
+.IP
+.nf
+\f[C]
+pgv\ show\ \-w
+\f[]
+.fi
+.SH SEE ALSO
+.PP
+\f[C]pgv(1)\f[]

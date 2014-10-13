@@ -1,0 +1,64 @@
+.TH "pgv\-skip" "" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv skip \- skips some changes from collecting to package.
+.SH SYNOPSYS
+.PP
+\f[B]pgv skip\f[] \-\-help
+.PP
+\f[B]pgv skip\f[] [[\-f FILENAME] ...] REVISION
+.SH DESCRIPTION
+.PP
+Sometimes it is needed to skip some changes from collecting to package.
+So, you can skip whole revision or just few files from it.
+.PP
+\f[B]pgv skip\f[] creates \f[I]skipfile\f[] in schemas base directory.
+Do not forget to commit it.
+Changes in \f[I]skipfile\f[] leads to appearance new revision.
+So revision can contains changes in \f[I]skiplist\f[] and nothing more.
+.PP
+When \f[B]pgv\f[] collects changes to package it looks for skiplist in
+last(newest) revision.
+So changes in the \f[I]skiplist\f[] can alterate resulting schema in a
+database.
+.SH OPTIONS
+.TP
+.B \-f \f[I]FILENAME\f[] \-\-filename \f[I]FILENAME\f[]
+.IP
+.nf
+\f[C]
+skip\ only\ selected\ file;
+\f[]
+.fi
+.RS
+.RE
+.TP
+.B \f[I]REVISION\f[]
+.IP
+.nf
+\f[C]
+skip\ chnage\ with\ *REVISION*.
+\f[]
+.fi
+.RS
+.RE
+.SH EXAMPLES
+.PP
+If you want to skip "bad" revision:
+.IP
+.nf
+\f[C]
+pgv\ skip\ <revision>
+\f[]
+.fi
+.PP
+If you commit wrong file, you can skip later:
+.IP
+.nf
+\f[C]
+pgv\ skip\ \-f\ bad\-file.sql\ <revision>
+\f[]
+.fi
+.SH SEE ALSO
+.PP
+\f[C]pgv(1)\f[] \f[C]pgv\-show(1)\f[]

@@ -1,0 +1,75 @@
+.TH "pgv\-initdb" "1" "July, 2014" "" ""
+.SH NAME
+.PP
+pgv initdb \- initializes new database for working with \f[I]pgv\f[].
+.SH SYNOPSYS
+.PP
+\f[B]pgv init\f[] \-\-help
+.PP
+\f[B]pgv init\f[] [\-o] [\-r REVISION] \-d DBNAME [\-h HOST] [\-p PORT]
+[\-U USERNAME] [\-w|\-W]
+.SH DESCRIPTION
+.PP
+\f[B]pgv init\f[] creates schema in the database for tracking changes.
+.SH OPTIONS
+.TP
+.B \-o \-\-overwrite
+recreates schema in the database if it is already exists;
+.RS
+.RE
+.TP
+.B \-r \f[I]REVISION\f[]
+mark that database is updated to revision.
+.RS
+.RE
+.SH CONNECTION OPTIONS
+.TP
+.B \-d \f[I]DBNAME\f[] \-\-dbname \f[I]DBNAME\f[]
+name of target database;
+.RS
+.RE
+.TP
+.B \-h \f[I]HOST\f[] \-\-host \f[I]HOST\f[]
+database server address;
+.RS
+.RE
+.TP
+.B \-p \f[I]PORT\f[] \-\-port \f[I]PORT\f[]
+database port;
+.RS
+.RE
+.TP
+.B \-U \f[I]USERNAME\f[] \-\-username \f[I]USERNAME\f[]
+database username;
+.RS
+.RE
+.TP
+.B \-w \-\-no\-password
+no ask for password;
+.RS
+.RE
+.TP
+.B \-W \-\-password
+ask for password.
+.RS
+.RE
+.SH EXAMPLES
+.PP
+Before pushing changes to new database, you should initialize it:
+.IP
+.nf
+\f[C]
+pgv\ initdb\ \-d\ mydb\ \-h\ test\ \-U\ test
+\f[]
+.fi
+.PP
+If you want to enable versioning on existing database:
+.IP
+.nf
+\f[C]
+pgv\ initdb\ \-r\ <revision>\ \-d\ mydb\ \-h\ test\ \-U\ test
+\f[]
+.fi
+.SH SEE ALSO
+.PP
+\f[C]pgv\ (1)\f[]
