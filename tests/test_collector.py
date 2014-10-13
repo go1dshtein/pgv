@@ -3,7 +3,10 @@ import os
 import pgv.vcs
 import pgv.collector
 
+from .common import is_travis
 
+
+@unittest.skipIf(is_travis(), "could not read from repository")
 class TestCollector(unittest.TestCase):
     def setUp(self):
         self.url = os.path.join(os.path.dirname(__file__), "..")

@@ -3,7 +3,10 @@ import os
 import pgv.vcs
 import pgv.skiplist
 
+from .common import is_travis
 
+
+@unittest.skipIf(is_travis(), "could not read from my repository")
 class TestSkipList(unittest.TestCase):
     def setUp(self):
         self.url = os.path.join(os.path.dirname(__file__), "..")

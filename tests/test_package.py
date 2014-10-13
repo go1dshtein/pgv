@@ -6,7 +6,10 @@ import shutil
 import pgv.vcs
 import pgv.package
 
+from .common import is_travis
 
+
+@unittest.skipIf(is_travis(), "could not read from repository")
 class TestPackage(unittest.TestCase):
     def setUp(self):
         url = os.path.join(os.path.dirname(__file__), "..")

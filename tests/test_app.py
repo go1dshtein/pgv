@@ -7,6 +7,8 @@ from pgv.vcs import Provider
 from pgv.config import parse
 import pgv.utils.app
 
+from .common import is_travis
+
 
 class TestInitDB(unittest.TestCase):
     def setUp(self):
@@ -42,6 +44,7 @@ class TestInitDB(unittest.TestCase):
                     mock.call().initialize(False, None)]
         self.assertEquals(actual, expected)
 
+    @unittest.skipIf(is_travis(), "could not read from repository")
     def test_initdb_revision(self):
         revision = "c2d658898d4a1369c20285464bd5bb95713173f6"
         options = self.get_options(revision=revision)
@@ -64,6 +67,7 @@ class TestInitDB(unittest.TestCase):
                     mock.call().initialize(True, None)]
         self.assertEquals(actual, expected)
 
+    @unittest.skipIf(is_travis(), "could not read from repository")
     def test_initdb_revision_overwrite(self):
         revision = "c2d658898d4a1369c20285464bd5bb95713173f6"
         options = self.get_options(revision=revision, overwrite=True)
@@ -121,6 +125,7 @@ class TestInit(unittest.TestCase):
         pgv.utils.app.RepositoryInitializer = self.original
 
 
+@unittest.skipIf(is_travis(), "could not read from my repository")
 class TestCollect(unittest.TestCase):
     def setUp(self):
         self.configdir = os.path.join(
@@ -340,6 +345,7 @@ class TestPush(unittest.TestCase):
         name, args, kwargs = self.installer.mock_calls[1]
         self.assertEquals(args[0], self.package())
 
+    @unittest.skipIf(is_travis(), "could not read from repository")
     def test_push_collect(self):
         input = "input"
         revision = "revision"
@@ -378,6 +384,7 @@ class TestPush(unittest.TestCase):
         pgv.package.Package = self.package_original
 
 
+@unittest.skipIf(is_travis(), "could not read from repository")
 class TestSkip(unittest.TestCase):
     def setUp(self):
         self.configdir = os.path.join(
@@ -452,6 +459,7 @@ class TestSkip(unittest.TestCase):
         pgv.utils.app.SkipList = self.original
 
 
+@unittest.skipIf(is_travis(), "could not read from repository")
 class TestShow(unittest.TestCase):
     def setUp(self):
         self.configdir = os.path.join(
