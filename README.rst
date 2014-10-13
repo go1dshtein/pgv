@@ -76,9 +76,6 @@ after all other.
     scripts/
       grants_post.sql
 
-More details about **schemas** and **scripts** see in
-`pgv.1 <https://github.com/go1dshtein/pgv/blob/master/docs/pgv.1.md>`__.
-
 Ok, you want to apply committed changes to database. Let's initialize
 it:
 
