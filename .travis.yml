@@ -3,9 +3,8 @@ python:
   - "2.7"
 install:
   - pip install tox
-  - git checkout testbranch
-  - git checkout master
 script: tox
 before_install:
   - sudo apt-get update
   - sudo apt-get install build-essential python-dev libevent-dev python-pip liblzma-dev
+  - sudo apt-get install python-psycopg2
