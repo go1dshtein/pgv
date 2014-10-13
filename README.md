@@ -105,3 +105,4 @@ After fix you want to push changes to **production**, but database allows only l
 To run test use:
 
 	tox
+
