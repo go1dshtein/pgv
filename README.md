@@ -1,4 +1,3 @@
-
 ##PostgreSQL Schema Versioning Tool
 **pgv** is an open source utility that makes available to support PostgreSQL schemas in a VCS repository.
 
