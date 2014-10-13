@@ -3,8 +3,9 @@ from setuptools import setup
 
 
 setup(name='pgv',
-      version='0.0.1',
+      version='0.0.2',
       description="PostgreSQL schema versioning tool",
+      long_description=open("README.rst").read(),
       author='Kirill Goldshtein',
       author_email='goldshtein.kirill@gmail.com',
       packages=['pgv', 'pgv.utils', 'pgv.vcs_provider'],
