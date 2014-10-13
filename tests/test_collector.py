@@ -28,4 +28,5 @@ class TestCollector(unittest.TestCase):
         self.assertEquals(
             revisions,
             ['cdfdbfb2bdcf8ee2dbf190bbf3a73ffbd77bd9b3',
-             'c2d658898d4a1369c20285464bd5bb95713173f6'])
+             'c2d658898d4a1369c20285464bd5bb95713173f6',
+             '629365bde60debc32239b51f3d4a9493218e8f02'])
