@@ -17,7 +17,7 @@ class TestFormat(unittest.TestCase):
                 result.append(os.path.join(root, filename))
             for dirname in dirnames:
                 result.append(os.path.join(root, dirname))
-        return map(lambda x: x[len(path):].lstrip('/'), result)
+        return set(map(lambda x: x[len(path):].lstrip('/'), result))
 
     def test_directory(self):
         tmpdir = tempfile.mkdtemp()
